@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Ecommerce</string>
+    <string name="SignIn">SignIn</string>
+    <string name="SignUp">SignUp</string>
+    <string name="MobileNumber">MobileNumber</string>
+    <string name="Email">Email</string>
+    <string name="Password">Password</string>
+    <string name="ConfirmPassword">ConfirmPassword</string>
+    <string name="Register">Register</string>
+    <string name="registrationSubTitle">register to access the content</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="Gender">Gender</string>
+    <string name="passwordWarning">plz enter same password in confirmPassword</string>
+    <string name="phoneNumberWarning">Phone Number is valid..</string>
+    <string name="PhoneNumberInvalid">Phone Number is invalid..</string>
+    <string name="AlreadyHaveAnAccount">Already have an account?</string>
+    <string name="successfullyLoggedIn">Successfully Logged In</string>
+    <string name="data">data</string>
+    <string name="emailWarning">enter badly formatted email</string>
 </resources>
