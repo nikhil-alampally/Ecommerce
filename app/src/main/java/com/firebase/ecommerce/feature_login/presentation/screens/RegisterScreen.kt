@@ -1,9 +1,5 @@
 package com.firebase.ecommerce.feature_login.presentation.screens
 
-
-import android.content.Context
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -133,10 +129,15 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             color = Color.Gray
         )
         Text(
-            text = stringResource(id = R.string.Email), fontSize = 15.sp,
+            text = stringResource(id = R.string.Email),
+            fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 40.dp, top = 10.dp, bottom = 5.dp),
+                .padding(
+                    start = 40.dp,
+                    top = 10.dp,
+                    bottom = 5.dp
+                ),
             fontWeight = FontWeight.SemiBold
         )
         OutlinedTextField(
@@ -147,12 +148,16 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_email_24),
-                    contentDescription = null, tint = Color.Gray.copy(alpha = 1f)
+                    contentDescription = null,
+                    tint = Color.Gray.copy(alpha = 1f)
                 )
             },
             supportingText = {
                 if (!validateEmail && emailId.isNotEmpty()) {
-                    Text(stringResource(id = R.string.emailWarning), color = Color.Red)
+                    Text(
+                        text = stringResource(id = R.string.emailWarning),
+                        color = Color.Red
+                    )
                 }
 
             },
@@ -168,11 +173,11 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             singleLine = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (!validateEmail) Color.Red else Color.LightGray
-
             ),
         )
         Text(
-            text = stringResource(id = R.string.Password), fontSize = 15.sp,
+            text = stringResource(id = R.string.Password),
+            fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 40.dp, top = 10.dp, bottom = 5.dp),
@@ -192,12 +197,16 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                         .clickable {
                             showPassword = !showPassword
                         }
-                        .size(20.dp), tint = Color.Black.copy(alpha = 0.5f)
+                        .size(20.dp),
+                    tint = Color.Black.copy(alpha = 0.5f)
                 )
             },
             supportingText = {
                 if (password.length < 6 && password.isNotEmpty()) {
-                    Text("mininmum length of password is 6", color = Color.Red)
+                    Text(
+                        text = stringResource(id = R.string.passwordValidation),
+                        color = Color.Red
+                    )
                 }
             },
             trailingIcon = {
@@ -210,7 +219,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(25.dp),
+                        tint = Color.Black.copy(alpha = 0.5f)
                     )
                 } else {
                     Icon(
@@ -221,7 +231,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(25.dp),
+                        tint = Color.Black.copy(alpha = 0.5f)
                     )
                 }
             },
@@ -257,9 +268,11 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             },
             supportingText = {
                 if (password != confirmPassword && confirmPassword.isNotEmpty()) {
-                    Text("password mismatch", color = Color.Red)
+                    Text(
+                        text = stringResource(id = R.string.passwordMismatch),
+                        color = Color.Red
+                    )
                 }
-
             },
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = if (password != confirmPassword) Color.Red else Color.LightGray
@@ -273,7 +286,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                         .clickable {
                             showConfirmPassword = !showConfirmPassword
                         }
-                        .size(20.dp), tint = Color.Black.copy(alpha = 0.5f)
+                        .size(20.dp),
+                    tint = Color.Black.copy(alpha = 0.5f)
                 )
             },
             trailingIcon = {
@@ -286,7 +300,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                             .clickable {
                                 showConfirmPassword = !showConfirmPassword
                             }
-                            .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(25.dp),
+                        tint = Color.Black.copy(alpha = 0.5f)
                     )
                 } else {
                     Icon(
@@ -297,7 +312,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                             .clickable {
                                 showConfirmPassword = !showConfirmPassword
                             }
-                            .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(25.dp),
+                        tint = Color.Black.copy(alpha = 0.5f)
                     )
                 }
             },
@@ -314,7 +330,7 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             } else VisualTransformation.None,
             maxLines = 1,
             singleLine = true,
-            )
+        )
         Text(
             text = stringResource(id = R.string.MobileNumber),
             fontSize = 15.sp,
@@ -331,12 +347,16 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_phone_24),
-                    contentDescription = null, tint = Color.Gray.copy(alpha = 1f)
+                    contentDescription = null,
+                    tint = Color.Gray.copy(alpha = 1f)
                 )
             },
             supportingText = {
                 if (mobileNumber.length < 10 && mobileNumber.isNotEmpty()) {
-                    Text("enter valid mobile number", color = Color.Red)
+                    Text(
+                        text = stringResource(id = R.string.mobileNumberValidation),
+                        color = Color.Red
+                    )
                 }
             },
             modifier = Modifier
@@ -355,7 +375,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
         )
 
         Text(
-            text = stringResource(id = R.string.Gender), fontSize = 15.sp,
+            text = stringResource(id = R.string.Gender),
+            fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 40.dp, top = 10.dp, bottom = 5.dp),
@@ -393,14 +414,16 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
 
         }
         if (errorMessage.isNotEmpty()) {
-            CustomDialogBox(showDialog = true, message = errorMessage, onCancelButtonClick = {
-                errorMessage=""
-            })
+            CustomDialogBox(
+                showDialog = true,
+                message = errorMessage,
+                onCancelButtonClick = {
+                    errorMessage = ""
+                })
         }
 
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
             scope.launch {
-                Log.e("data1", data.value?.isSuccess.toString())
                 if (data.value?.isSuccess?.isNotEmpty() == true) {
                     errorMessage = "successfully logged in"
                 }
@@ -415,10 +438,7 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             Text(text = stringResource(id = R.string.AlreadyHaveAnAccount))
             TextButton(
                 onClick = {
-                    validatePhoneNumber(
-                        mobileNumber,
-                        context
-                    )
+
                 },
             ) {
                 Text(
@@ -477,18 +497,12 @@ fun SimpleRadioButtonComponent(onSelectedOption: (String) -> Unit = {}) {
     }
 }
 
-fun validatePhoneNumber(phoneNumber: String, context: Context) {
-    if (android.util.Patterns.PHONE.matcher(phoneNumber).matches() && phoneNumber.length == 10) {
-
-        Toast.makeText(context, R.string.phoneNumberWarning, Toast.LENGTH_SHORT).show()
-    } else {
-        Toast.makeText(context, R.string.PhoneNumberInvalid, Toast.LENGTH_SHORT).show()
-    }
-}
-
-
 @Composable
-fun CustomDialogBox(showDialog: Boolean = false,message:String,onCancelButtonClick:()->Unit={}) {
+fun CustomDialogBox(
+    showDialog: Boolean = false,
+    message: String,
+    onCancelButtonClick: () -> Unit = {}
+) {
 
     var dialogOpen by remember {
         mutableStateOf(showDialog)
@@ -531,7 +545,7 @@ fun CustomDialogBox(showDialog: Boolean = false,message:String,onCancelButtonCli
                                 onCancelButtonClick.invoke()
                                 dialogOpen = false
                             }) {
-                                Text(stringResource(id = R.string.ok), fontSize = 20.sp)
+                                Text(text = stringResource(id = R.string.ok), fontSize = 20.sp)
                             }
                         }
 

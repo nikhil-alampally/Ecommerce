@@ -17,6 +17,9 @@
     <string name="AlreadyHaveAnAccount">Already have an account?</string>
     <string name="successfullyLoggedIn">Successfully Logged In</string>
     <string name="data">data</string>
-    <string name="emailWarning">enter badly formatted email</string>
+    <string name="emailWarning">entered email is invalid</string>
     <string name="ok">OK</string>
+    <string name="passwordValidation">minimum length of password is 6</string>
+    <string name="passwordMismatch">"password mismatch"</string>
+    <string name="mobileNumberValidation">enter valid mobile number</string>
 </resources>
