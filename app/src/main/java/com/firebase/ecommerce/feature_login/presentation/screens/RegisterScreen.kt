@@ -2,25 +2,27 @@ package com.firebase.ecommerce.feature_login.presentation.screens
 
 
 import android.content.Context
-import android.telephony.PhoneNumberFormattingTextWatcher
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,7 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -44,20 +46,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultShadowColor
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -203,7 +199,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                 if (password.length < 6 && password.isNotEmpty()) {
                     Text("mininmum length of password is 6", color = Color.Red)
                 }
-
             },
             trailingIcon = {
                 if (showPassword) {
@@ -233,7 +228,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 40.dp, end = 40.dp),
-            /*  shape = RoundedCornerShape(15.dp),*/
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
             ),
@@ -318,11 +312,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             if (!showConfirmPassword) {
                 PasswordVisualTransformation()
             } else VisualTransformation.None,
-            /*  shape = RoundedCornerShape(15.dp),*/
             maxLines = 1,
             singleLine = true,
-
-
             )
         Text(
             text = stringResource(id = R.string.MobileNumber),
@@ -344,12 +335,9 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                 )
             },
             supportingText = {
-
                 if (mobileNumber.length < 10 && mobileNumber.isNotEmpty()) {
                     Text("enter valid mobile number", color = Color.Red)
                 }
-
-
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -382,14 +370,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
         Button(
             shape = RoundedCornerShape(15.dp),
             onClick = {
-                /* if (password != confirmPassword) {
-                     Toast.makeText(
-                         context,
-                         R.string.passwordWarning,
-                         Toast.LENGTH_SHORT
-                     ).show()
-                 }*/
-
                 viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails)
 
             },
@@ -413,8 +393,8 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
 
         }
         if (errorMessage.isNotEmpty()) {
-            ShowAlertDialog(description = errorMessage, showDialog = true, onConfirmButtonClick = {
-                errorMessage = ""
+            CustomDialogBox(showDialog = true, message = errorMessage, onCancelButtonClick = {
+                errorMessage=""
             })
         }
 
@@ -423,9 +403,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
                 Log.e("data1", data.value?.isSuccess.toString())
                 if (data.value?.isSuccess?.isNotEmpty() == true) {
                     errorMessage = "successfully logged in"
-
-                    /* Toast.makeText(context,R.string.successfullyLoggedIn, Toast.LENGTH_SHORT)
-                    .show()*/
                 }
             }
         })
@@ -451,8 +428,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             }
 
         }
-
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -466,8 +441,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             scope.launch {
                 if (data.value?.isError?.isNotEmpty() == true) {
                     errorMessage = data.value!!.isError!!
-
-                    /* Toast.makeText(context, data.value!!.isError, Toast.LENGTH_SHORT).show()*/
                 }
             }
 
@@ -515,28 +488,80 @@ fun validatePhoneNumber(phoneNumber: String, context: Context) {
 
 
 @Composable
-fun ShowAlertDialog(
-    showDialog: Boolean = false,
-    description: String,
-    onConfirmButtonClick: () -> Unit = {}
-) {
-    var showDialogBox by remember {
+fun CustomDialogBox(showDialog: Boolean = false,message:String,onCancelButtonClick:()->Unit={}) {
+
+    var dialogOpen by remember {
         mutableStateOf(showDialog)
     }
-    if (showDialogBox) {
-        AlertDialog(onDismissRequest = {}, confirmButton = {
-            Button(onClick = {
-                onConfirmButtonClick.invoke()
-                showDialogBox = false
 
-            }) {
-                Text("Ok")
+    if (dialogOpen) {
+        Dialog(onDismissRequest = {
+            dialogOpen = false
+        }
+        ) {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = Color.Transparent
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 30.dp)
+                            .fillMaxWidth()
+                            .background(
+                                color = Color.White,
+                                shape = RoundedCornerShape(percent = 10)
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(height = 36.dp))
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = message,
+                            fontSize = 18.sp
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            TextButton(onClick = {
+                                onCancelButtonClick.invoke()
+                                dialogOpen = false
+                            }) {
+                                Text(stringResource(id = R.string.ok), fontSize = 20.sp)
+                            }
+                        }
+
+                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.cancelbutton),
+                        contentDescription = null,
+                        tint = Color.Black,
+                        modifier = Modifier
+                            .background(
+                                color = Color.White,
+                                shape = CircleShape
+                            )
+                            .border(
+                                width = 2.dp,
+                                shape = CircleShape,
+                                color = Color.Black
+                            )
+                            .size(22.dp)
+                            .align(
+                                alignment = Alignment.TopCenter
+                            )
+                            .clickable {
+                                onCancelButtonClick.invoke()
+                                dialogOpen = false
+                            }
+                    )
+                }
             }
-        }, title = {
-            Text(description)
-        }, shape = RectangleShape,
-            modifier = Modifier.wrapContentSize()
-        )
+        }
     }
 }
 

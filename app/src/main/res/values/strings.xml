@@ -18,4 +18,5 @@
     <string name="successfullyLoggedIn">Successfully Logged In</string>
     <string name="data">data</string>
     <string name="emailWarning">enter badly formatted email</string>
+    <string name="ok">OK</string>
 </resources>
