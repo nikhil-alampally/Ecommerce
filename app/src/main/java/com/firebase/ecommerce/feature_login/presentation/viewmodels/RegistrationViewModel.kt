@@ -1,8 +1,10 @@
 package com.firebase.ecommerce.feature_login.presentation.viewmodels
 
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.feature_login.domain.use_case.StoreRegistrationDetailsWithAuthenticationUseCase
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
@@ -19,13 +21,13 @@ class RegistrationViewModel @Inject constructor(private val registrationUseCase:
     private val _signInState = Channel<SignInState>()
     val signInState = _signInState.receiveAsFlow()
 
-    fun storeRegistrationDetailsWithAuthentication(registrationDetails: RegistrationDetails) {
+    fun storeRegistrationDetailsWithAuthentication(registrationDetails: RegistrationDetails,context: Context) {
         viewModelScope.launch {
             registrationUseCase.storeRegistrationDetailsWithAuthentication(registrationDetails)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _signInState.send(SignInState(isSuccess = "Successfully Logged In"))
+                            _signInState.send(SignInState(isSuccess = context.getString(R.string.successfullyLoggedIn)))
                         }
                         is Resource.Loading -> {
                             _signInState.send(SignInState(isLoading = true))
