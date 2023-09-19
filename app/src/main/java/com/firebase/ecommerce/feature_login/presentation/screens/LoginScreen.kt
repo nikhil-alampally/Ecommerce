@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -70,14 +69,14 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(dimensionResource(id = R.dimen.sixteen)),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = stringResource(R.string.login),
             modifier = Modifier
-                .padding(top = 55.dp)
+                .padding(top = dimensionResource(id = R.dimen.fiftyFive))
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
             fontStyle = FontStyle.Normal,
@@ -91,13 +90,13 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
             fontWeight = FontWeight.Normal,
             color = Color.Gray
         )
-        Spacer(modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.twenty)))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             IconButton(
-                modifier = Modifier.size(128.dp),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.oneTwentyEight)),
                 onClick = {}
             ) {
                 Image(
@@ -107,10 +106,10 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     modifier = Modifier.fillMaxSize()
                 )
             }
-            Spacer(modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.twenty)))
             IconButton(
                 onClick = {},
-                modifier = Modifier.size(128.dp),
+                modifier = Modifier.size(dimensionResource(id = R.dimen.oneTwentyEight)),
             ) {
                 Image(
                     painter = painterResource(R.drawable.google),
@@ -124,12 +123,12 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp)
+                .padding(dimensionResource(id = R.dimen.twenty))
         ) {
             Text(text = stringResource(R.string.email),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 15.sp)
-            Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.ten)))
 
             OutlinedTextField(
                 value = email.value,
@@ -162,7 +161,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
 
                 ),
             )
-            Spacer(modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.twenty)))
             Text(
                 text = stringResource(R.string.password),
                 fontWeight = FontWeight.SemiBold,
@@ -184,7 +183,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(20.dp), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(dimensionResource(id = R.dimen.twenty)), tint = Color.Black.copy(alpha = 0.5f)
                     )
                 },
                 supportingText = {
@@ -206,7 +205,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                                 .clickable {
                                     showPassword = !showPassword
                                 }
-                                .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                                .size(dimensionResource(id = R.dimen.twentyFive)), tint = Color.Black.copy(alpha = 0.5f)
                         )
                     } else {
                         Icon(
@@ -217,7 +216,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                                 .clickable {
                                     showPassword = !showPassword
                                 }
-                                .size(25.dp), tint = Color.Black.copy(alpha = 0.5f)
+                                .size(dimensionResource(id = R.dimen.twentyFive)), tint = Color.Black.copy(alpha = 0.5f)
                         )
                     }
                 },
@@ -237,7 +236,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                 ),
 
                 )
-            Spacer(modifier = Modifier.size(60.dp))
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.sixty)))
             Button(
                 shape = RoundedCornerShape(dimensionResource(id =  R . dimen . fifteen)),
                 onClick = {
@@ -268,7 +267,9 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
 
             }
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(start = 10.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = dimensionResource(id = R.dimen.ten)),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {

@@ -12,5 +12,8 @@
     <dimen name="eight">8.dp</dimen>
     <dimen name="thirtySix">36.dp</dimen>
     <dimen name="sixteen">16.dp</dimen>
+    <dimen name="oneTwentyEight">128.dp</dimen>
+    <dimen name="fiftyFive">55.dp</dimen>
+    <dimen name="sixty">60.dp</dimen>
 
 </resources>

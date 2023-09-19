@@ -385,6 +385,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             shape = RoundedCornerShape(dimensionResource(id =  R . dimen . fifteen)),
             onClick = {
                 viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails,context)
+                navigateToLogin.invoke()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -412,7 +413,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                 onCancelButtonClick = {
                     errorMessage = ""
                 })*/
-            navigateToLogin.invoke()
+
         }
 
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
