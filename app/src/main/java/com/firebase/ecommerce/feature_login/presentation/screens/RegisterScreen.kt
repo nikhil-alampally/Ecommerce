@@ -64,7 +64,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
+fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel = hiltViewModel()) {
     var emailId by rememberSaveable {
         mutableStateOf("")
     }
@@ -385,7 +385,6 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             shape = RoundedCornerShape(dimensionResource(id =  R . dimen . fifteen)),
             onClick = {
                 viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails,context)
-
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -407,12 +406,13 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
 
         }
         if (errorMessage.isNotEmpty()) {
-            CustomDialogBox(
+            /*CustomDialogBox(
                 showDialog = true,
                 message = errorMessage,
                 onCancelButtonClick = {
                     errorMessage = ""
-                })
+                })*/
+            navigateToLogin.invoke()
         }
 
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
@@ -431,7 +431,7 @@ fun RegistrationScreen(viewModel: RegistrationViewModel = hiltViewModel()) {
             Text(text = stringResource(id = R.string.AlreadyHaveAnAccount))
             TextButton(
                 onClick = {
-
+                     navigateToLogin.invoke()
                 },
             ) {
                 Text(
