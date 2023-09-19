@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="two">2.dp</dimen>
+    <dimen name="twenty">20.dp</dimen>
+    <dimen name="forty">40.dp</dimen>
+    <dimen name="twentyTwo">22.dp</dimen>
+    <dimen name="ten">10.dp</dimen>
+    <dimen name="five">5.dp</dimen>
+    <dimen name="twentyFive">25.dp</dimen>
+    <dimen name="thirty">30.dp</dimen>
+    <dimen name="fifteen">15.dp</dimen>
+    <dimen name="eight">8.dp</dimen>
+    <dimen name="thirtySix">36.dp</dimen>
+    <dimen name="sixteen">16.dp</dimen>
+
+</resources>
