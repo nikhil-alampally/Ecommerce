@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -125,9 +126,11 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                 .fillMaxSize()
                 .padding(dimensionResource(id = R.dimen.twenty))
         ) {
-            Text(text = stringResource(R.string.email),
+            Text(
+                text = stringResource(R.string.email),
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp)
+                fontSize = 15.sp
+            )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.ten)))
 
             OutlinedTextField(
@@ -183,7 +186,8 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(dimensionResource(id = R.dimen.twenty)), tint = Color.Black.copy(alpha = 0.5f)
+                            .size(dimensionResource(id = R.dimen.twenty)),
+                        tint = Color.Black.copy(alpha = 0.5f)
                     )
                 },
                 supportingText = {
@@ -205,7 +209,8 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                                 .clickable {
                                     showPassword = !showPassword
                                 }
-                                .size(dimensionResource(id = R.dimen.twentyFive)), tint = Color.Black.copy(alpha = 0.5f)
+                                .size(dimensionResource(id = R.dimen.twentyFive)),
+                            tint = Color.Black.copy(alpha = 0.5f)
                         )
                     } else {
                         Icon(
@@ -216,7 +221,8 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                                 .clickable {
                                     showPassword = !showPassword
                                 }
-                                .size(dimensionResource(id = R.dimen.twentyFive)), tint = Color.Black.copy(alpha = 0.5f)
+                                .size(dimensionResource(id = R.dimen.twentyFive)),
+                            tint = Color.Black.copy(alpha = 0.5f)
                         )
                     }
                 },
@@ -238,7 +244,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                 )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.sixty)))
             Button(
-                shape = RoundedCornerShape(dimensionResource(id =  R . dimen . fifteen)),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.fifteen)),
                 onClick = {
                     viewModel.loginUser(email.value, password.value)
 
@@ -266,39 +272,48 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                 )
 
             }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = dimensionResource(id = R.dimen.ten)),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = dimensionResource(id = R.dimen.ten)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(text = stringResource(R.string.don_t_have_an_account))
+                TextButton(
+                    onClick = { navigate.invoke() }
                 ) {
-                    Text(text = stringResource(R.string.don_t_have_an_account))
-                    TextButton(
-                        onClick = { navigate.invoke() }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.register),
-                            color = Color(0xff34495E)
-                        )
+                    Text(
+                        text = stringResource(R.string.register),
+                        color = Color(0xff34495E)
+                    )
+                }
+            }
+            LaunchedEffect(key1 = state.value?.isSuccess) {
+                scope.launch {
+                    if (state.value?.isSuccess?.isNotEmpty() == true) {
+                        val success = state.value?.isSuccess
+                        Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
                     }
                 }
-                LaunchedEffect(key1 = state.value?.isSuccess) {
-                    scope.launch {
-                        if (state.value?.isSuccess?.isNotEmpty() == true) {
-                            val success = state.value?.isSuccess
-                            Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
-                        }
-                    }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                if (state.value?.isLoading == true) {
+                    CircularProgressIndicator()
                 }
-                LaunchedEffect(key1 = state.value?.isError) {
-                    scope.launch {
-                        if (state.value?.isError?.isNotEmpty() == true) {
-                            val error = state.value?.isError
-                            Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
-                        }
+            }
+            LaunchedEffect(key1 = state.value?.isError) {
+                scope.launch {
+                    if (state.value?.isError?.isNotEmpty() == true) {
+                        val error = state.value?.isError
+                        Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
                     }
                 }
             }
         }
     }
+}
