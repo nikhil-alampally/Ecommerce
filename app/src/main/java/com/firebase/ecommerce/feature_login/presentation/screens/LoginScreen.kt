@@ -3,22 +3,27 @@ package com.firebase.ecommerce.feature_login.presentation.screens
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,6 +60,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,6 +77,7 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
     var showPassword by rememberSaveable {
         mutableStateOf(false)
     }
+    var showProgress by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -246,9 +255,14 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
 
                 )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.sixty)))
+
             Button(
                 shape = RoundedCornerShape(dimensionResource(id = R.dimen.fifteen)),
                 onClick = {
+                    if (showProgress.not()) {
+                        viewModel.loginUser(email.value, password.value)
+                    }
+                    showProgress = true
                     viewModel.loginUser(email.value, password.value)
 
                 },
@@ -263,17 +277,35 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     containerColor = Color(0xff34495E)
 
                 ),
+                interactionSource = if (showProgress) remember { NoRippleInteractionSource() } else remember { MutableInteractionSource() },
                 enabled = email.value.isNotEmpty() && password.value.isNotEmpty()
             ) {
+                Box(modifier = Modifier.width(20.dp), contentAlignment = Alignment.Center) {
+                    if (state.value?.isLoading == true) {
+                        androidx.compose.material.CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colors.secondary
+                        )
+                        Spacer(modifier = Modifier.size(10.dp))
+                    }
+                }
                 Text(
                     text = stringResource(id = R.string.SignIn),
                     modifier = Modifier
+                        .weight(1f)
+                        .offset((-12).dp)
                         .wrapContentSize()
                         .padding(dimensionResource(id = R.dimen.eight)),
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
                 )
 
+            }
+            if (showProgress) {
+                LaunchedEffect(showProgress) {
+                    delay(3000)
+                    showProgress = false
+                }
             }
             Row(
                 modifier = Modifier
@@ -300,15 +332,6 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     }
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (state.value?.isLoading == true) {
-                    CircularProgressIndicator()
-                }
-            }
             LaunchedEffect(key1 = state.value?.isError) {
                 scope.launch {
                     if (state.value?.isError?.isNotEmpty() == true) {
@@ -319,4 +342,13 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
             }
         }
     }
+}
+
+class NoRippleInteractionSource : MutableInteractionSource {
+
+    override val interactions: Flow<Interaction> = emptyFlow()
+
+    override suspend fun emit(interaction: Interaction) {}
+
+    override fun tryEmit(interaction: Interaction) = true
 }
