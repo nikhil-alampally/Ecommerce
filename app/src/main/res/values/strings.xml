@@ -22,4 +22,13 @@
     <string name="passwordValidation">minimum length of password is 6</string>
     <string name="passwordMismatch">"password mismatch"</string>
     <string name="mobileNumberValidation">enter valid mobile number</string>
+    <string name="sign_in">Sign In</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="register">Register</string>
+    <string name="mininmum_length_of_password_is_6">mininmum length of password is 6</string>
+    <string name="password">Password</string>
+    <string name="email">Email</string>
+    <string name="or_login_with_email">Or Login with Email</string>
+    <string name="access_account">Login to access account</string>
+    <string name="login">Login</string>
 </resources>

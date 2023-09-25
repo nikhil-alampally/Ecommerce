@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
+import com.firebase.ecommerce.navigation.NavGraph
 import com.firebase.ecommerce.ui.theme.EcommerceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,8 +26,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RegistrationScreen()
-
+                    NavGraph()
                 }
             }
         }
