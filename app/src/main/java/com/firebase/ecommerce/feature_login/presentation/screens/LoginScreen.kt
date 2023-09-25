@@ -27,7 +27,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -256,58 +255,23 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
 
                 )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.sixty)))
-
-            Button(
-                shape = RoundedCornerShape(dimensionResource(id = R.dimen.fifteen)),
-                onClick = {
-                    if (showProgress.not()) {
-                        viewModel.loginUser(email.value, password.value)
-                    }
-                    showProgress = true
-                    viewModel.loginUser(email.value, password.value)
-
+            ButtonSign(
+                onClick = { viewModel.loginUser(email.value, password.value) },
+                textComposable = {
+                    Text(
+                        text = stringResource(id = R.string.SignIn),
+                        modifier = Modifier
+                            .weight(1f)
+                            .offset((-12).dp)
+                            .wrapContentSize()
+                            .padding(dimensionResource(id = R.dimen.eight)),
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = dimensionResource(id = R.dimen.thirty),
-                        start = dimensionResource(id = R.dimen.thirty),
-                        end = dimensionResource(id = R.dimen.thirty)
-                    ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xff34495E)
-
-                ),
-                interactionSource = if (showProgress) remember { NoRippleInteractionSource() } else remember { MutableInteractionSource() },
-                enabled = email.value.isNotEmpty() && password.value.isNotEmpty()
-            ) {
-                Box(modifier = Modifier.width(20.dp), contentAlignment = Alignment.Center) {
-                    if (state.value?.isLoading == true) {
-                      CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color.Yellow
-                        )
-                        Spacer(modifier = Modifier.size(10.dp))
-                    }
-                }
-                Text(
-                    text = stringResource(id = R.string.SignIn),
-                    modifier = Modifier
-                        .weight(1f)
-                        .offset((-12).dp)
-                        .wrapContentSize()
-                        .padding(dimensionResource(id = R.dimen.eight)),
-                    color = Color.White,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-            }
-            if (showProgress) {
-                LaunchedEffect(showProgress) {
-                    delay(3000)
-                    showProgress = false
-                }
-            }
+                enabled = email.value.isNotEmpty() && password.value.isNotEmpty(),
+                onStateChange = state.value?.isLoading == true
+            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -341,6 +305,53 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     }
                 }
             }
+        }
+    }
+}
+@Composable
+fun ButtonSign(
+    onClick: () -> Unit,
+    onStateChange: Boolean = false,
+    textComposable: @Composable () -> Unit,
+    enabled: Boolean = false,
+) {
+    var showProgress by remember { mutableStateOf(false) }
+    Button(
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.fifteen)),
+        onClick = {
+            if (showProgress.not()) {
+                onClick.invoke()
+            }
+            showProgress = true
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = dimensionResource(id = R.dimen.thirty),
+                start = dimensionResource(id = R.dimen.thirty),
+                end = dimensionResource(id = R.dimen.thirty)
+            ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xff34495E)
+        ),
+        interactionSource = if (showProgress) remember { NoRippleInteractionSource() } else remember { MutableInteractionSource() },
+        enabled = enabled
+    ) {
+        Box(modifier = Modifier.width(20.dp), contentAlignment = Alignment.Center) {
+            if (onStateChange) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = Color.Yellow
+                )
+                Spacer(modifier = Modifier.size(10.dp))
+            }
+        }
+        textComposable.invoke()
+    }
+    if (showProgress) {
+        LaunchedEffect(showProgress) {
+            delay(3000)
+            showProgress = false
         }
     }
 }
