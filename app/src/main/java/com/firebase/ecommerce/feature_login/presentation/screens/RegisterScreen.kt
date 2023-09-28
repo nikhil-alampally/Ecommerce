@@ -1,5 +1,6 @@
 package com.firebase.ecommerce.feature_login.presentation.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -19,9 +21,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -53,18 +52,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.RegistrationViewModel
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel = hiltViewModel()) {
+fun RegistrationScreen(
+    navigateToLogin: () -> Unit,
+    viewModel: RegistrationViewModel = hiltViewModel()
+) {
+    var userName by rememberSaveable {
+        mutableStateOf("")
+    }
     var emailId by rememberSaveable {
         mutableStateOf("")
     }
@@ -90,17 +97,27 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
     var errorMessage by remember {
         mutableStateOf("")
     }
-    val context= LocalContext.current
+    var successMessage by remember {
+        mutableStateOf("")
+    }
+
+
+    val context = LocalContext.current
+    val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
+    mAuth.firebaseAuthSettings.setAppVerificationDisabledForTesting(false)
+
 
     val data = viewModel.signInState.collectAsState(initial = null)
     val registrationDetails = RegistrationDetails(
         email = emailId,
         password = password,
         mobileNumber = mobileNumber,
-        gender = gender
+        gender = gender,
+        userName = userName
 
     )
     val validateEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(emailId).matches()
+
 
     Column(
         modifier = Modifier
@@ -109,6 +126,9 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center
     ) {
+
+
+
         Text(
             text = stringResource(id = R.string.Register),
             textAlign = TextAlign.Center,
@@ -122,10 +142,60 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = dimensionResource(id =  R . dimen . thirty)),
+                .padding(bottom = dimensionResource(id = R.dimen.thirty)),
             fontStyle = FontStyle.Normal,
             fontWeight = FontWeight.Normal,
             color = Color.Gray
+        )
+        Text(
+            text = "User Name",
+            fontSize = 15.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
+                ),
+            fontWeight = FontWeight.SemiBold
+        )
+        OutlinedTextField(
+            value = userName,
+            onValueChange = {
+                userName = it
+            },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_person_24),
+                    contentDescription = null,
+                    tint = Color.Gray.copy(alpha = 1f)
+                )
+            },
+            supportingText = {
+                if (userName.length<5 && userName.isNotEmpty()) {
+                    Text(
+                        text = "enter your name",
+                        color = Color.Red
+                    )
+                }
+
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    end = dimensionResource(id = R.dimen.forty)
+                ),
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Words,
+                autoCorrect = true,
+                keyboardType = KeyboardType.Text,
+            ),
+            maxLines = 1,
+            singleLine = true,
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = if (userName.length<5) Color.Red else Color.LightGray
+            ),
         )
         Text(
             text = stringResource(id = R.string.Email),
@@ -133,9 +203,9 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = dimensionResource(id =  R . dimen . forty),
-                    top = dimensionResource(id =  R . dimen . ten),
-                    bottom = dimensionResource(id =  R . dimen . five)
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
                 ),
             fontWeight = FontWeight.SemiBold
         )
@@ -162,7 +232,10 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), end = dimensionResource(id =  R . dimen . forty)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    end = dimensionResource(id = R.dimen.forty)
+                ),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrect = true,
@@ -179,7 +252,11 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), top = dimensionResource(id =  R . dimen . ten), bottom = dimensionResource(id =  R . dimen . five)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
+                ),
             fontWeight = FontWeight.SemiBold
         )
         OutlinedTextField(
@@ -193,7 +270,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                     contentDescription = null,
                     modifier = Modifier
                         .wrapContentSize()
-                        .size(dimensionResource(id =  R . dimen . twenty)),
+                        .size(dimensionResource(id = R.dimen.twenty)),
                     tint = Color.Black.copy(alpha = 0.5f)
                 )
             },
@@ -215,7 +292,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(dimensionResource(id =  R . dimen . twentyFive)),
+                            .size(dimensionResource(id = R.dimen.twentyFive)),
                         tint = Color.Black.copy(alpha = 0.5f)
                     )
                 } else {
@@ -227,14 +304,17 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                             .clickable {
                                 showPassword = !showPassword
                             }
-                            .size(dimensionResource(id =  R . dimen . twentyFive)),
+                            .size(dimensionResource(id = R.dimen.twentyFive)),
                         tint = Color.Black.copy(alpha = 0.5f)
                     )
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), end = dimensionResource(id =  R . dimen . forty)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    end = dimensionResource(id = R.dimen.forty)
+                ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
             ),
@@ -254,7 +334,11 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), top = dimensionResource(id =  R . dimen . ten), bottom = dimensionResource(id =  R . dimen . five)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
+                ),
             fontWeight = FontWeight.SemiBold
         )
         OutlinedTextField(
@@ -279,7 +363,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                     contentDescription = null,
                     modifier = Modifier
                         .wrapContentSize()
-                        .size(dimensionResource(id =  R . dimen . twenty)),
+                        .size(dimensionResource(id = R.dimen.twenty)),
                     tint = Color.Black.copy(alpha = 0.5f)
                 )
             },
@@ -293,7 +377,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                             .clickable {
                                 showConfirmPassword = !showConfirmPassword
                             }
-                            .size(dimensionResource(id =  R . dimen . twentyFive)),
+                            .size(dimensionResource(id = R.dimen.twentyFive)),
                         tint = Color.Black.copy(alpha = 0.5f)
                     )
                 } else {
@@ -305,14 +389,17 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
                             .clickable {
                                 showConfirmPassword = !showConfirmPassword
                             }
-                            .size(dimensionResource(id =  R . dimen . twentyFive)),
+                            .size(dimensionResource(id = R.dimen.twentyFive)),
                         tint = Color.Black.copy(alpha = 0.5f)
                     )
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), end = dimensionResource(id =  R . dimen . forty)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    end = dimensionResource(id = R.dimen.forty)
+                ),
             keyboardOptions = KeyboardOptions(
                 autoCorrect = true,
                 keyboardType = KeyboardType.Password,
@@ -329,7 +416,11 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), top = dimensionResource(id =  R . dimen . ten), bottom = dimensionResource(id =  R . dimen . five)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
+                ),
             fontWeight = FontWeight.SemiBold
         )
         OutlinedTextField(
@@ -354,7 +445,10 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), end = dimensionResource(id =  R . dimen . forty)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    end = dimensionResource(id = R.dimen.forty)
+                ),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrect = true,
@@ -367,59 +461,69 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             ),
         )
 
+
         Text(
             text = stringResource(id = R.string.Gender),
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = dimensionResource(id =  R . dimen . forty), top = dimensionResource(id =  R . dimen . ten), bottom = dimensionResource(id =  R . dimen . five)),
+                .padding(
+                    start = dimensionResource(id = R.dimen.forty),
+                    top = dimensionResource(id = R.dimen.ten),
+                    bottom = dimensionResource(id = R.dimen.five)
+                ),
             fontWeight = FontWeight.SemiBold
         )
-        Row(modifier = Modifier.padding(start = dimensionResource(id =  R . dimen . forty))) {
+        Row(modifier = Modifier.padding(start = dimensionResource(id = R.dimen.forty))) {
             SimpleRadioButtonComponent(
                 onSelectedOption = {
                     gender = it
                 })
         }
-        Button(
-            shape = RoundedCornerShape(dimensionResource(id =  R . dimen . fifteen)),
+        LoadingButton(
             onClick = {
-                viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails,context)
-                navigateToLogin.invoke()
+                viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails, context)
+                Log.e("error",errorMessage)
+                if(data.value?.isSuccess?.isNotEmpty() == true){
+                    navigateToLogin.invoke()
+                }
+
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = dimensionResource(id =  R . dimen . thirty), start = dimensionResource(id =  R . dimen . thirty), end = dimensionResource(id =  R . dimen . thirty)),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xff34495E)
+            textComposable = {
+                Text(
+                    text = stringResource(id = R.string.SignIn),
+                    modifier = Modifier
+                        .weight(1f)
+                        .offset((-12).dp)
+                        .wrapContentSize()
+                        .padding(dimensionResource(id = R.dimen.eight)),
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            enabled = emailId.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && mobileNumber.isNotEmpty() && (password.length == 6 || password.length > 6) && validateEmail,
+            onStateChange = data.value?.isLoading == true
+        )
 
-            ),
-            enabled = emailId.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty() && mobileNumber.isNotEmpty() && (password.length == 6 || password.length > 6) && validateEmail
-        ) {
-            Text(
-                text = stringResource(id = R.string.SignUp),
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(dimensionResource(id =  R . dimen . eight)),
-                color = Color.White,
-                fontWeight = FontWeight.SemiBold
-            )
 
-        }
-        if (errorMessage.isNotEmpty()) {
-            /*CustomDialogBox(
+        if (errorMessage.isNotEmpty()||successMessage.isNotEmpty()) {
+            CustomDialogBox(
                 showDialog = true,
-                message = errorMessage,
+                message = if(successMessage.isNotEmpty())successMessage else errorMessage ,
                 onCancelButtonClick = {
                     errorMessage = ""
-                })*/
+                    if(successMessage.isNotEmpty()){
+                        navigateToLogin.invoke()
+                    }
+                })
 
         }
 
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
             scope.launch {
                 if (data.value?.isSuccess?.isNotEmpty() == true) {
-                    errorMessage = "successfully logged in"
+                    successMessage="registration sucessfully done"
+
                 }
             }
         })
@@ -432,7 +536,7 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             Text(text = stringResource(id = R.string.AlreadyHaveAnAccount))
             TextButton(
                 onClick = {
-                     navigateToLogin.invoke()
+                    navigateToLogin.invoke()
                 },
             ) {
                 Text(
@@ -442,15 +546,8 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
             }
 
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (data.value?.isLoading == true) {
-                CircularProgressIndicator()
-            }
-        }
+
+
         LaunchedEffect(key1 = data.value?.isError?.isNotEmpty() == true, block = {
             scope.launch {
                 if (data.value?.isError?.isNotEmpty() == true) {
@@ -460,9 +557,8 @@ fun RegistrationScreen(navigateToLogin:()->Unit,viewModel: RegistrationViewModel
 
         })
     }
-
-
 }
+
 
 @Composable
 fun SimpleRadioButtonComponent(onSelectedOption: (String) -> Unit = {}) {
@@ -517,7 +613,7 @@ fun CustomDialogBox(
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(top = dimensionResource(id =  R . dimen . thirty))
+                            .padding(top = dimensionResource(id = R.dimen.thirty))
                             .fillMaxWidth()
                             .background(
                                 color = Color.White,
@@ -525,9 +621,9 @@ fun CustomDialogBox(
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(height = dimensionResource(id =  R . dimen . thirtySix)))
+                        Spacer(modifier = Modifier.height(height = dimensionResource(id = R.dimen.thirtySix)))
                         Text(
-                            modifier = Modifier.padding(horizontal = dimensionResource(id =  R . dimen . sixteen)),
+                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.sixteen)),
                             text = message,
                             fontSize = 18.sp
                         )
@@ -554,11 +650,11 @@ fun CustomDialogBox(
                                 shape = CircleShape
                             )
                             .border(
-                                width = dimensionResource(id =  R . dimen . two),
+                                width = dimensionResource(id = R.dimen.two),
                                 shape = CircleShape,
                                 color = Color.Black
                             )
-                            .size(dimensionResource(id =  R . dimen . twentyTwo))
+                            .size(dimensionResource(id = R.dimen.twentyTwo))
                             .align(
                                 alignment = Alignment.TopCenter
                             )
@@ -571,7 +667,10 @@ fun CustomDialogBox(
             }
         }
     }
+
 }
+
+
 
 
 

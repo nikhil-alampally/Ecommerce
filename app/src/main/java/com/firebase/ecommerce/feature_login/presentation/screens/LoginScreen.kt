@@ -1,6 +1,10 @@
 package com.firebase.ecommerce.feature_login.presentation.screens
 
-import android.widget.Toast
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
@@ -59,25 +63,87 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.feature_home.data.HomeDataDto
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel()) {
+fun LoginScreen(
+    navigate: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel(),
+    navigateToHomeScreen: () -> Unit
+) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val state = viewModel.signInState.collectAsState(initial = null)
+    val googleState = viewModel.googleSignInState.collectAsState(initial = null)
+    val googleData = viewModel.googleSignDataState.collectAsState(initial = null)
     val validateEmail = android.util.Patterns.EMAIL_ADDRESS.matcher(email.value).matches()
     var showPassword by rememberSaveable {
         mutableStateOf(false)
     }
-    var showProgress by remember { mutableStateOf(false) }
+    var errorMessage by remember {
+        mutableStateOf("")
+    }
+    var url by rememberSaveable {
+        mutableStateOf("")
+    }
+    var googleDataForHomePage: HomeDataDto? by remember {
+        mutableStateOf(null)
+    }
+    /* if(googleDataForHomePage!=null) {*/
+
+
+    /*}*/
+    Log.e("googleData", "${googleData.value}")
+
+    /*val dataStore=StoreData()*/
+
+    val token = stringResource(R.string.default_web_client_id)
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+
+            val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+                Log.e("cred", account.displayName.toString())
+                viewModel.signWithGoogle(credential)
+                val registrationDetails = HomeDataDto(
+                    userName = account.displayName.toString(),
+                    image = account.photoUrl.toString(),
+                    email = account.email.toString(),
+                )
+                Log.e("googleregistration", registrationDetails.toString())
+                googleDataForHomePage = registrationDetails
+
+
+
+                Log.e("url", url)
+
+                /* scope.launch {
+                     dataStore.saveData(account.displayName.toString())
+                 }*/
+            } catch (e: ApiException) {
+                Log.w("TAG", "Google sign in failed", e)
+            }
+        }
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(token)
+        .requestEmail()
+        .build()
+    googleDataForHomePage?.let { viewModel.storingGoogleSignInDataIntoFireStore(it) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -119,9 +185,39 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     modifier = Modifier.fillMaxSize()
                 )
             }
+            LaunchedEffect(key1 = url, block = {
+
+                scope.launch {
+                    viewModel.getUserID().collect {
+                        if (it != null) {
+                            Log.e("url1", url)
+                            url = it
+                            Log.e("url2", url)
+                        }
+                    }
+
+                }
+                if (url.isNotEmpty()) {
+                    Log.e("url3", url)
+                    navigateToHomeScreen.invoke()
+                }
+            })
+
+
+
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.twenty)))
             IconButton(
-                onClick = {},
+                onClick = {
+                    Log.e("url4", url)
+                    if (url.isEmpty()) {
+                        Log.e("url5", url)
+                        val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                        launcher.launch(googleSignInClient.signInIntent)
+                    } else {
+                        navigateToHomeScreen.invoke()
+                    }
+
+                },
                 modifier = Modifier.size(dimensionResource(id = R.dimen.oneTwentyEight)),
             ) {
                 Image(
@@ -255,8 +351,15 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
 
                 )
             Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.sixty)))
-            ButtonSign(
-                onClick = { viewModel.loginUser(email.value, password.value) },
+            LoadingButton(
+                onClick = {
+
+                    viewModel.loginUser(email.value, password.value)
+                    if (state.value?.isSuccess?.isNotEmpty() == true) {
+                        navigateToHomeScreen.invoke()
+                    }
+
+                },
                 textComposable = {
                     Text(
                         text = stringResource(id = R.string.SignIn),
@@ -289,27 +392,56 @@ fun LoginScreen(navigate: () -> Unit, viewModel: LoginViewModel = hiltViewModel(
                     )
                 }
             }
-            LaunchedEffect(key1 = state.value?.isSuccess) {
+            if (errorMessage.isNotEmpty()) {
+                CustomDialogBox(
+                    showDialog = true,
+                    message = errorMessage,
+                    onCancelButtonClick = {
+                        errorMessage = ""
+                    })
+
+            }
+            LaunchedEffect(key1 = googleState.value?.isSuccess?.isNotEmpty() == true, block = {
                 scope.launch {
-                    if (state.value?.isSuccess?.isNotEmpty() == true) {
-                        val success = state.value?.isSuccess
-                        Toast.makeText(context, "${success}", Toast.LENGTH_LONG).show()
+                    if (googleState.value?.isSuccess?.isNotEmpty() == true) {
+                        viewModel.saveUserName(googleState.value?.isSuccess!!)
+                        /*dataStore.saveData(googleState.value?.isSuccess!!)*/
                     }
                 }
+            })
+
+            LaunchedEffect(key1 = state.value?.isSuccess?.isNotEmpty() == true) {
+                Log.e("hello3", "hello")
+                scope.launch {
+                    Log.e("hello4", "hello")
+                    if (state.value?.isSuccess?.isNotEmpty() == true) {
+                        viewModel.saveUserName(state.value?.isSuccess!!)
+                        /* dataStore.saveData(state.value?.isSuccess!!)*/
+                        Log.e("hello5", "hello")
+                    }
+                }
+
             }
-            LaunchedEffect(key1 = state.value?.isError) {
+
+
+
+            LaunchedEffect(key1 = state.value?.isError, key2 = googleState.value?.isError) {
                 scope.launch {
                     if (state.value?.isError?.isNotEmpty() == true) {
-                        val error = state.value?.isError
-                        Toast.makeText(context, "${error}", Toast.LENGTH_LONG).show()
+                        errorMessage = state.value!!.isError!!
+                        Log.e("errormessage", errorMessage)
+                    }
+                    if (googleState.value?.isError?.isNotEmpty() == true) {
+                        errorMessage = googleState.value!!.isError!!
                     }
                 }
             }
         }
     }
 }
+
 @Composable
-fun ButtonSign(
+fun LoadingButton(
     onClick: () -> Unit,
     onStateChange: Boolean = false,
     textComposable: @Composable () -> Unit,

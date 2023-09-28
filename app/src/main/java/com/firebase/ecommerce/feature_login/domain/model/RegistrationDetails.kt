@@ -4,5 +4,6 @@ data class RegistrationDetails(
     val email:String,
     val password:String,
     val mobileNumber:String,
-  val  gender:String
+  val  gender:String,
+    val userName:String
 )

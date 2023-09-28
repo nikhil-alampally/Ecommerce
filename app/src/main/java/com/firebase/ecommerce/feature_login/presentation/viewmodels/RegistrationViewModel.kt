@@ -9,10 +9,17 @@ import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.feature_login.domain.use_case.StoreRegistrationDetailsWithAuthenticationUseCase
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.presentation.SignInState
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,5 +46,7 @@ class RegistrationViewModel @Inject constructor(private val registrationUseCase:
                 }
         }
     }
+
+
 }
 

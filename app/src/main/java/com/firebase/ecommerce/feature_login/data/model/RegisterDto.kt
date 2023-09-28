@@ -6,13 +6,15 @@ data class RegisterDto(
     val email: String,
     val password: String,
     val mobileNumber: String,
-    val gender: String
+    val gender: String,
+    val userName:String
 )
 fun toDomain(registrationDetails: RegistrationDetails): RegisterDto {
     return RegisterDto(
         email = registrationDetails.email,
         password = registrationDetails.password,
         mobileNumber = registrationDetails.mobileNumber,
-        gender = registrationDetails.gender
+        gender = registrationDetails.gender,
+        userName = registrationDetails.userName
     )
 }
