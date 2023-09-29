@@ -57,7 +57,7 @@ class LoginViewModel @Inject constructor(
     }
     fun storingGoogleSignInDataIntoFireStore(homeData: HomeDataDto)=
         viewModelScope.launch {
-            storingGoogleSignInDataIntoFireStoreUseCase.StoringGoogleSignInDataIntoFireStore(homeData)
+            storingGoogleSignInDataIntoFireStoreUseCase.storingGoogleSignInDataIntoFireStore(homeData)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {

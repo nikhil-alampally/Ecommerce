@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class StoringGoogleSignInDataIntoFireStoreUseCase@Inject constructor(private val registrationRepository: RegistrationRepository) {
-    fun StoringGoogleSignInDataIntoFireStore(homeData: HomeDataDto): Flow<Resource<Any>> {
+    fun storingGoogleSignInDataIntoFireStore(homeData: HomeDataDto): Flow<Resource<Any>> {
         Log.e("home data to add use case","${homeData}")
         return registrationRepository.addDetailsIntoFireStore(homeData)
     }

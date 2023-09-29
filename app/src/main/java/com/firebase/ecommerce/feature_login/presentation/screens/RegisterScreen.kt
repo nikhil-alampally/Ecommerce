@@ -1,6 +1,5 @@
 package com.firebase.ecommerce.feature_login.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -128,7 +127,6 @@ fun RegistrationScreen(
     ) {
 
 
-
         Text(
             text = stringResource(id = R.string.Register),
             textAlign = TextAlign.Center,
@@ -148,7 +146,7 @@ fun RegistrationScreen(
             color = Color.Gray
         )
         Text(
-            text = "User Name",
+            text = stringResource(id = R.string.UserName),
             fontSize = 15.sp,
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,9 +170,9 @@ fun RegistrationScreen(
                 )
             },
             supportingText = {
-                if (userName.length<5 && userName.isNotEmpty()) {
+                if (userName.length < 5 && userName.isNotEmpty()) {
                     Text(
-                        text = "enter your name",
+                        text = stringResource(id = R.string.enterYourName),
                         color = Color.Red
                     )
                 }
@@ -194,7 +192,7 @@ fun RegistrationScreen(
             maxLines = 1,
             singleLine = true,
             colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = if (userName.length<5) Color.Red else Color.LightGray
+                focusedBorderColor = if (userName.length < 5) Color.Red else Color.LightGray
             ),
         )
         Text(
@@ -483,11 +481,9 @@ fun RegistrationScreen(
         LoadingButton(
             onClick = {
                 viewModel.storeRegistrationDetailsWithAuthentication(registrationDetails, context)
-                Log.e("error",errorMessage)
-                if(data.value?.isSuccess?.isNotEmpty() == true){
+                if (data.value?.isSuccess?.isNotEmpty() == true) {
                     navigateToLogin.invoke()
                 }
-
             },
             textComposable = {
                 Text(
@@ -506,13 +502,13 @@ fun RegistrationScreen(
         )
 
 
-        if (errorMessage.isNotEmpty()||successMessage.isNotEmpty()) {
+        if (errorMessage.isNotEmpty() || successMessage.isNotEmpty()) {
             CustomDialogBox(
                 showDialog = true,
-                message = if(successMessage.isNotEmpty())successMessage else errorMessage ,
+                message = if (successMessage.isNotEmpty()) successMessage else errorMessage,
                 onCancelButtonClick = {
                     errorMessage = ""
-                    if(successMessage.isNotEmpty()){
+                    if (successMessage.isNotEmpty()) {
                         navigateToLogin.invoke()
                     }
                 })
@@ -522,7 +518,7 @@ fun RegistrationScreen(
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
             scope.launch {
                 if (data.value?.isSuccess?.isNotEmpty() == true) {
-                    successMessage="registration sucessfully done"
+                    successMessage = "registration successfully done login to access"
 
                 }
             }
@@ -667,7 +663,6 @@ fun CustomDialogBox(
             }
         }
     }
-
 }
 
 

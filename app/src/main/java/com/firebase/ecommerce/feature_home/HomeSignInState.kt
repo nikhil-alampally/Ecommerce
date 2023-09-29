@@ -1,6 +1,5 @@
 package com.firebase.ecommerce.feature_home
 
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
 import com.firebase.ecommerce.feature_home.domain.HomeData
 
 data class HomeSignInState(

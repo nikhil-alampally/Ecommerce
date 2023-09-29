@@ -17,7 +17,7 @@ object HomeModule {
     @Provides
     @Singleton
     fun provideFireBaseAuthenticationInstance()= Firebase
-   /* fun context()= this.context()*/
+
    @Provides
    @Singleton
    fun homeRepoImpl(fireBase:Firebase,dataStore:StoreData): HomeRepository {

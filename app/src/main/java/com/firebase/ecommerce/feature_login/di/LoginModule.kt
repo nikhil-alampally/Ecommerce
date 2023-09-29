@@ -21,8 +21,6 @@ object LoginModule {
     @Singleton
     fun provideFireBaseAuthenticationInstance()=FirebaseAuth.getInstance()
 
-
-
     @Provides
     @Singleton
     fun authenticationRepoImpl(firebaseAuth: FirebaseAuth,dataStore: StoreData,fireBase:Firebase): RegistrationRepository {

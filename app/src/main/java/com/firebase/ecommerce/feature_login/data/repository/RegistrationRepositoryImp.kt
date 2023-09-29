@@ -1,7 +1,7 @@
 package com.firebase.ecommerce.feature_login.data.repository
 
 
-import android.util.Log
+
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
@@ -22,41 +22,45 @@ import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import javax.inject.Inject
 
-class RegistrationRepositoryImp @Inject constructor(private val firebaseAuth: FirebaseAuth,private val dataStore: StoreData,val firebase: Firebase) : RegistrationRepository {
+class RegistrationRepositoryImp @Inject constructor(
+    private val firebaseAuth: FirebaseAuth,
+    private val dataStore: StoreData,
+    val firebase: Firebase
+) : RegistrationRepository {
 
 
     override suspend fun authenticateEmailAndPassword(registrationDetails: RegistrationDetails): Flow<Resource<Any>> {
         return callbackFlow {
             trySend(Resource.Loading())
 
-        try {
-            val firebaseAuth = firebaseAuth
-            val userDetails = firebaseAuth.createUserWithEmailAndPassword(
-                registrationDetails.email,
-                registrationDetails.password
-            ).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    trySend(Resource.Success(task.result))
+            try {
+                val firebaseAuth = firebaseAuth
+                val userDetails = firebaseAuth.createUserWithEmailAndPassword(
+                    registrationDetails.email,
+                    registrationDetails.password
+                ).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        trySend(Resource.Success(task.result))
+                    }
+                }.await()
+
+                val user = userDetails.user?.uid
+
+                val fireStoreInstance = Firebase.firestore
+                user?.let {
+                    fireStoreInstance.collection("Profile").document(it)
+                        .set(toDomain(registrationDetails))
                 }
-            }.await()
-
-            val user = userDetails.user?.uid
-
-            val fireStoreInstance = Firebase.firestore
-            user?.let {
-                fireStoreInstance.collection("Profile").document(it)
-                    .set(toDomain(registrationDetails))
+            } catch (e: Exception) {
+                trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
             }
-        }catch (e:Exception){
-            trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
-        }
-
             awaitClose {
                 close()
             }
 
         }
     }
+
     override fun loginUser(email: String, password: String): Flow<Resource<AuthResult>> {
         return flow {
             emit(Resource.Loading())
@@ -66,6 +70,7 @@ class RegistrationRepositoryImp @Inject constructor(private val firebaseAuth: Fi
             emit(Resource.Error(message = it.message.toString()))
         }
     }
+
     override fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>> {
         return flow {
             emit(Resource.Loading())
@@ -79,39 +84,28 @@ class RegistrationRepositoryImp @Inject constructor(private val firebaseAuth: Fi
 
     override fun addDetailsIntoFireStore(homeData: HomeDataDto): Flow<Resource<Any>> {
         return callbackFlow {
-            Log.e("home data to add","${homeData}")
             trySend(Resource.Loading(true))
-
             try {
                 dataStore.getData.collect {
-                    Log.e("home data to add2","${homeData}")
                     if (it != null) {
-                        Log.e("print", it)
                         val docRef =
-                            it.let { it1 -> firebase.firestore.collection("Profile").document(it1)}
+                            it.let { it1 -> firebase.firestore.collection("Profile").document(it1) }
                         docRef.set(homeData).addOnFailureListener {
-                           trySend(Resource.Error(message = it.localizedMessage))
-                            Log.e("home data to add3","${homeData}")
-
-                        }.addOnSuccessListener { documentSnapshot ->
+                            trySend(Resource.Error(message = it.localizedMessage))
+                        }.addOnSuccessListener {
                             trySend(Resource.Success(data = "successfully added"))
-                            Log.e("home data to add4","${homeData}")
                         }
                     }
 
                 }
-            }catch (e:Exception){
-                Log.e("home data to add5","${homeData}")
+            } catch (e: Exception) {
                 trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
             }
-            awaitClose{
+            awaitClose {
                 close()
             }
-
-
         }
     }
-
 }
 
 

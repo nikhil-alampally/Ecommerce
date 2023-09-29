@@ -15,5 +15,7 @@
     <dimen name="oneTwentyEight">128.dp</dimen>
     <dimen name="fiftyFive">55.dp</dimen>
     <dimen name="sixty">60.dp</dimen>
+    <dimen name="fifty">50.dp</dimen>
+    <dimen name="oneFifty">150.dp</dimen>
 
 </resources>

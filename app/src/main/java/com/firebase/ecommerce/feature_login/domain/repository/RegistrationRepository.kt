@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.Flow
 interface RegistrationRepository {
 
     suspend fun authenticateEmailAndPassword(registrationDetails: RegistrationDetails): Flow<Resource<Any>>
-
     fun loginUser(email:String, password:String): Flow<Resource<AuthResult>>
     fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>>
     fun addDetailsIntoFireStore(homeData: HomeDataDto):Flow<Resource<Any>>
