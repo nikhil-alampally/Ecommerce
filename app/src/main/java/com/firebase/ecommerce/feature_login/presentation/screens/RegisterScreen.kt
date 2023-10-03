@@ -56,6 +56,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.ConnectionState
+import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.RegistrationViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -102,7 +104,7 @@ fun RegistrationScreen(
 
 
     val context = LocalContext.current
-    val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
+    val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
     mAuth.firebaseAuthSettings.setAppVerificationDisabledForTesting(false)
 
 
@@ -503,23 +505,38 @@ fun RegistrationScreen(
 
 
         if (errorMessage.isNotEmpty() || successMessage.isNotEmpty()) {
+            var showDialog by remember {
+                mutableStateOf(true)
+            }
             CustomDialogBox(
-                showDialog = true,
+                showDialog = showDialog,
                 message = if (successMessage.isNotEmpty()) successMessage else errorMessage,
                 onCancelButtonClick = {
                     errorMessage = ""
                     if (successMessage.isNotEmpty()) {
                         navigateToLogin.invoke()
                     }
+                    showDialog = false
                 })
 
+        }
+        val connection by connectivityState()
+        if (connection == ConnectionState.Unavailable) {
+            var showDialog by remember {
+                mutableStateOf(true)
+            }
+            CustomDialogBox(
+                message = stringResource(id = R.string.NoInternet),
+                onCancelButtonClick = { showDialog = true },
+                showDialog = showDialog
+            )
         }
 
         LaunchedEffect(key1 = data.value?.isSuccess, block = {
             scope.launch {
                 if (data.value?.isSuccess?.isNotEmpty() == true) {
-                    successMessage = "registration successfully done login to access"
-
+                    successMessage =
+                        context.getString(R.string.RegistrationSuccessfullyDoneLoginToAccess)
                 }
             }
         })
@@ -542,8 +559,6 @@ fun RegistrationScreen(
             }
 
         }
-
-
         LaunchedEffect(key1 = data.value?.isError?.isNotEmpty() == true, block = {
             scope.launch {
                 if (data.value?.isError?.isNotEmpty() == true) {
@@ -629,7 +644,7 @@ fun CustomDialogBox(
                         ) {
                             TextButton(onClick = {
                                 onCancelButtonClick.invoke()
-                                dialogOpen = false
+                                /* dialogOpen = false*/
                             }) {
                                 Text(text = stringResource(id = R.string.ok), fontSize = 20.sp)
                             }

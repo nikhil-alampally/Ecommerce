@@ -1,7 +1,9 @@
 package com.firebase.ecommerce.feature_login.presentation.viewmodels
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
@@ -55,13 +57,13 @@ class LoginViewModel @Inject constructor(
         return dataStore.getData
 
     }
-    fun storingGoogleSignInDataIntoFireStore(homeData: HomeDataDto)=
+    fun storingGoogleSignInDataIntoFireStore(homeData: HomeDataDto,context: Context)=
         viewModelScope.launch {
             storingGoogleSignInDataIntoFireStoreUseCase.storingGoogleSignInDataIntoFireStore(homeData)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _googleSignDataState.send(SignInState(isSuccess = "sucess"))
+                            _googleSignDataState.send(SignInState(isSuccess = context.getString(R.string.successfullyLoggedIn)))
                         }
                         is Resource.Loading -> {
                             _googleSignDataState.send(SignInState(isLoading = true))

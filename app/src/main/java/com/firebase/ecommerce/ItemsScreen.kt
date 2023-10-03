@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
+
 
 @Composable
 fun ItemScreen(){
 
- Box(modifier = Modifier.fillMaxSize().background(color = Color.Gray))
+ Box(modifier = Modifier
+  .fillMaxSize()
+  .background(color = Color.Gray))
+
 }

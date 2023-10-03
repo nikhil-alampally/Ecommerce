@@ -61,6 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.ConnectionState
+import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -80,6 +82,19 @@ fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     navigateToHomeScreen: () -> Unit
 ) {
+    val connection by connectivityState()
+    if (connection == ConnectionState.Unavailable) {
+        var showDialog by remember {
+            mutableStateOf(true)
+        }
+        CustomDialogBox(
+            message = stringResource(id = R.string.NoInternet),
+            onCancelButtonClick = { showDialog = true },
+            showDialog = showDialog
+        )
+    }
+
+
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -123,7 +138,7 @@ fun LoginScreen(
         .requestIdToken(token)
         .requestEmail()
         .build()
-    googleDataForHomePage?.let { viewModel.storingGoogleSignInDataIntoFireStore(it) }
+    googleDataForHomePage?.let { viewModel.storingGoogleSignInDataIntoFireStore(it,context) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -200,7 +215,10 @@ fun LoginScreen(
                 )
             }
         }
-        Text(text = stringResource(R.string.or_login_with_email), fontWeight = FontWeight.SemiBold)
+        Text(
+            text = stringResource(R.string.or_login_with_email),
+            fontWeight = FontWeight.SemiBold
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -364,11 +382,15 @@ fun LoginScreen(
                 }
             }
             if (errorMessage.isNotEmpty()) {
+                var showDialog by remember {
+                    mutableStateOf(true)
+                }
                 CustomDialogBox(
-                    showDialog = true,
+                    showDialog = showDialog,
                     message = errorMessage,
                     onCancelButtonClick = {
                         errorMessage = ""
+                        showDialog = false
                     })
 
             }
@@ -388,7 +410,11 @@ fun LoginScreen(
                 }
 
             }
-            LaunchedEffect(key1 = state.value?.isError, key2 = googleState.value?.isError,key3=googleData.value?.isError) {
+            LaunchedEffect(
+                key1 = state.value?.isError,
+                key2 = googleState.value?.isError,
+                key3 = googleData.value?.isError
+            ) {
                 scope.launch {
                     if (state.value?.isError?.isNotEmpty() == true) {
                         errorMessage = state.value!!.isError!!
@@ -404,6 +430,7 @@ fun LoginScreen(
         }
     }
 }
+        
 
 @Composable
 fun LoadingButton(
@@ -459,3 +486,4 @@ class NoRippleInteractionSource : MutableInteractionSource {
 
     override fun tryEmit(interaction: Interaction) = true
 }
+

@@ -54,8 +54,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.ConnectionState
+import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.data.Categories
 import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -121,7 +124,13 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
         }
     })
 
-
+    val connection by connectivityState()
+    if(connection== ConnectionState.Unavailable) {
+        var showDialog by remember {
+            mutableStateOf(true)
+        }
+        CustomDialogBox(message = "on internet please turn on internet", onCancelButtonClick = {showDialog=false}, showDialog = showDialog)
+    }
     Column(modifier=Modifier.fillMaxSize()) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -212,7 +221,12 @@ fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->U
                 .wrapContentSize()
                 .height(dimensionResource(R.dimen.oneFifty))
                 .background(color = Color.Transparent)
-                .padding(start = dimensionResource(R.dimen.twenty), end = dimensionResource(R.dimen.twenty), bottom = dimensionResource(R.dimen.ten), top = dimensionResource(R.dimen.ten)),
+                .padding(
+                    start = dimensionResource(R.dimen.twenty),
+                    end = dimensionResource(R.dimen.twenty),
+                    bottom = dimensionResource(R.dimen.ten),
+                    top = dimensionResource(R.dimen.ten)
+                ),
             shape = RoundedCornerShape(dimensionResource(R.dimen.twentyFive)),
             border = BorderStroke(2.dp, cardColor),
             elevation = CardDefaults.outlinedCardElevation(8.dp),

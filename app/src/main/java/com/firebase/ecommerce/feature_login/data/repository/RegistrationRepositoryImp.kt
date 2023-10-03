@@ -2,6 +2,8 @@ package com.firebase.ecommerce.feature_login.data.repository
 
 
 
+import android.content.Context
+import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
@@ -86,14 +88,14 @@ class RegistrationRepositoryImp @Inject constructor(
         return callbackFlow {
             trySend(Resource.Loading(true))
             try {
-                dataStore.getData.collect {
-                    if (it != null) {
+                dataStore.getData.collect {value->
+                    if (value != null) {
                         val docRef =
-                            it.let { it1 -> firebase.firestore.collection("Profile").document(it1) }
+                            value.let { it1 -> firebase.firestore.collection("Profile").document(it1) }
                         docRef.set(homeData).addOnFailureListener {
                             trySend(Resource.Error(message = it.localizedMessage))
                         }.addOnSuccessListener {
-                            trySend(Resource.Success(data = "successfully added"))
+                            trySend(Resource.Success(data = value))
                         }
                     }
 
