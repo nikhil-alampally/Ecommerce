@@ -31,4 +31,16 @@
     <string name="or_login_with_email">Or Login with Email</string>
     <string name="access_account">Login to access account</string>
     <string name="login">Login</string>
+    <string name="UserName">User Name</string>
+    <string name="enterYourName">Enter your name</string>
+    <string name="successMessage">registration successfully done login to access</string>
+    <string name="getTheBestElectronics">GET THE BEST ELECTRONICS</string>
+    <string name="getTheBestMenShopping">GET THE BEST MEN SHOPPING</string>
+    <string name="getTheBestWomenShopping">GET THE BEST WOMEN SHOPPING</string>
+    <string name="getTheBestSkinCare">SKINCARE AND PERFUMES SHOPPING</string>
+    <string name="homeAndDecor">HOME AND DECOR SHOPPING</string>
+    <string name="orders">orders</string>
+    <string name="NoInternet">no internet please turn on internet</string>
+    <string name="RegistrationSuccessfullyDoneLoginToAccess">registration successfully done login to access</string>
+    <string name="successfullyStored">Successfully Stored</string>
 </resources>

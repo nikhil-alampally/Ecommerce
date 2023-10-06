@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id ("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -73,6 +74,7 @@ dependencies {
     //hilt
     implementation ("com.google.dagger:hilt-android:2.44")
     implementation("com.google.firebase:firebase-firestore:24.4.1")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -85,4 +87,7 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation ("androidx.navigation:navigation-compose:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.28.0")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
 }
