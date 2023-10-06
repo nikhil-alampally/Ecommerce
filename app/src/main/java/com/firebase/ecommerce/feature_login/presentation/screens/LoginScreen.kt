@@ -64,6 +64,7 @@ import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_login.NoRippleInteractionSource
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -458,7 +459,7 @@ fun LoadingButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xff34495E)
         ),
-        interactionSource = if (showProgress) remember { NoRippleInteractionSource() } else remember { MutableInteractionSource() },
+        interactionSource = if (showProgress) remember {NoRippleInteractionSource() } else remember { MutableInteractionSource() },
         enabled = enabled
     ) {
         Box(modifier = Modifier.width(20.dp), contentAlignment = Alignment.Center) {
@@ -480,10 +481,5 @@ fun LoadingButton(
     }
 }
 
-class NoRippleInteractionSource : MutableInteractionSource {
-    override val interactions: Flow<Interaction> = emptyFlow()
-    override suspend fun emit(interaction: Interaction) {}
 
-    override fun tryEmit(interaction: Interaction) = true
-}
 

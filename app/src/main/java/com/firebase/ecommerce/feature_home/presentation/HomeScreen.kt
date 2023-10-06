@@ -222,10 +222,8 @@ fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->U
                 .height(dimensionResource(R.dimen.oneFifty))
                 .background(color = Color.Transparent)
                 .padding(
-                    start = dimensionResource(R.dimen.twenty),
-                    end = dimensionResource(R.dimen.twenty),
-                    bottom = dimensionResource(R.dimen.ten),
-                    top = dimensionResource(R.dimen.ten)
+                    horizontal = dimensionResource(R.dimen.twenty),
+                    vertical = dimensionResource(R.dimen.ten)
                 ),
             shape = RoundedCornerShape(dimensionResource(R.dimen.twentyFive)),
             border = BorderStroke(2.dp, cardColor),
