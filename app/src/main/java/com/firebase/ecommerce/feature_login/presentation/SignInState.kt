@@ -5,3 +5,4 @@ data class SignInState(
         val isSuccess: String? = "",
         val isError: String? = ""
     )
+

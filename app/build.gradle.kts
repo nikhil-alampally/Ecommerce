@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id ("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    id ("kotlin-parcelize")
 }
 
 android {
@@ -73,8 +74,7 @@ dependencies {
     //hilt
     implementation ("com.google.dagger:hilt-android:2.44")
     implementation("com.google.firebase:firebase-firestore:24.4.1")
-    implementation("com.google.firebase:firebase-storage:20.1.0")
-    implementation("com.google.firebase:firebase-storage-ktx:20.2.1")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -87,20 +87,17 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation ("androidx.navigation:navigation-compose:2.5.0")
-
-    dependencies {
-        // Import the BoM for the Firebase platform
-        implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
-
-        // Add the dependency for the Cloud Storage library
-        // When using the BoM, you don't specify versions in Firebase library dependencies
-        implementation("com.google.firebase:firebase-storage-ktx")
-    }
-
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.28.0")
+    implementation ("androidx.datastore:datastore-preferences:1.0.0")
     //coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     implementation ("androidx.compose.ui:ui:$1.4.3")
     implementation ("androidx.compose.material:material:$1.4.3")
+
+    implementation ("com.google.firebase:firebase-core:21.1.1")
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation("com.google.firebase:firebase-storage-ktx")
 
 }

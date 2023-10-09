@@ -16,12 +16,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(private val registrationUseCase: StoreRegistrationDetailsWithAuthenticationUseCase) : ViewModel() {
+class RegistrationViewModel @Inject constructor(private val registrationUseCase: StoreRegistrationDetailsWithAuthenticationUseCase) :
+    ViewModel() {
 
     private val _signInState = Channel<SignInState>()
     val signInState = _signInState.receiveAsFlow()
 
-    fun storeRegistrationDetailsWithAuthentication(registrationDetails: RegistrationDetails,context: Context) {
+    fun storeRegistrationDetailsWithAuthentication(
+        registrationDetails: RegistrationDetails,
+        context: Context
+    ) {
         viewModelScope.launch {
             registrationUseCase.storeRegistrationDetailsWithAuthentication(registrationDetails)
                 .collect { result ->
@@ -29,9 +33,11 @@ class RegistrationViewModel @Inject constructor(private val registrationUseCase:
                         is Resource.Success -> {
                             _signInState.send(SignInState(isSuccess = context.getString(R.string.successfullyLoggedIn)))
                         }
+
                         is Resource.Loading -> {
                             _signInState.send(SignInState(isLoading = true))
                         }
+
                         is Resource.Error -> {
                             _signInState.send(SignInState(isError = result.message))
                         }
