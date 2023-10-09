@@ -73,6 +73,8 @@ dependencies {
     //hilt
     implementation ("com.google.dagger:hilt-android:2.44")
     implementation("com.google.firebase:firebase-firestore:24.4.1")
+    implementation("com.google.firebase:firebase-storage:20.1.0")
+    implementation("com.google.firebase:firebase-storage-ktx:20.2.1")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -85,4 +87,20 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     implementation ("androidx.navigation:navigation-compose:2.5.0")
+
+    dependencies {
+        // Import the BoM for the Firebase platform
+        implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+
+        // Add the dependency for the Cloud Storage library
+        // When using the BoM, you don't specify versions in Firebase library dependencies
+        implementation("com.google.firebase:firebase-storage-ktx")
+    }
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    implementation ("androidx.compose.ui:ui:$1.4.3")
+    implementation ("androidx.compose.material:material:$1.4.3")
+
 }
