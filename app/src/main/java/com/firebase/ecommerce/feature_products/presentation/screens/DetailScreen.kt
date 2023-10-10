@@ -30,11 +30,23 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.ConnectionState
+import com.firebase.ecommerce.core.connectivityState
+import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
 
 @Composable
 fun DetailScreen(product: Product, navController: NavController){
-
+    val connection by connectivityState()
+    if(connection== ConnectionState.Unavailable) {
+        var showDialog by remember {
+            mutableStateOf(true)
+        }
+        CustomDialogBox(
+            message = stringResource(id = R.string.NoInternet),
+            onCancelButtonClick = {showDialog=false},
+            showDialog = showDialog)
+    }
     var colorChange by remember {
         mutableStateOf(false)
     }
@@ -55,7 +67,8 @@ fun DetailScreen(product: Product, navController: NavController){
                 .fillMaxWidth()
                 .height(150.dp)
                 .weight(2f)
-            , contentScale = ContentScale.Fit)
+            , contentScale = ContentScale.Fit,
+        placeholder = painterResource(id = R.drawable.img))
         
         Row(modifier = Modifier
             .fillMaxWidth()

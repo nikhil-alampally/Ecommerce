@@ -37,7 +37,7 @@ fun getProducts(id:String){
                             ?.let { _getData.send(it) }
                     }else{
                        val data= result.data?.filter { it.category==_selectedCategory.value }
-                        data?.let { ProductsState(products = it) }?.let { _getData.send(it) }
+                        data?.let { ProductsState(products = it, isLoading = false) }?.let { _getData.send(it) }
                         println("data=${data}")
                     }
                 }

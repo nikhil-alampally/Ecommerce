@@ -51,8 +51,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.presentation.setData
+import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
@@ -66,6 +69,17 @@ fun ItemScreen(
     navController: NavHostController,
     onItemClick: () -> Unit = {}
 ) {
+    val connection by connectivityState()
+    if (connection == ConnectionState.Unavailable) {
+        var showDialog by remember {
+            mutableStateOf(true)
+        }
+        CustomDialogBox(
+            message = stringResource(id = R.string.NoInternet),
+            onCancelButtonClick = { showDialog = false },
+            showDialog = showDialog
+        )
+    }
 
     val items = viewModel.getData.collectAsState(initial = null)
     val scope = rememberCoroutineScope()
@@ -77,7 +91,6 @@ fun ItemScreen(
     }
     LaunchedEffect(key1 = Unit, key2 = viewModel.selectedCategory.value, block = {
         viewModel.getProducts(category)
-
     })
 
     LaunchedEffect(key1 = items.value?.products, block = {
@@ -120,14 +133,15 @@ fun ItemScreen(
         })
     }
 
-
 }
+
 
 @Composable
 fun SingleItems(item: Product, onItemClick: () -> Unit = {}) {
     var colorChange by remember {
         mutableStateOf(false)
     }
+
     Card(
         modifier = Modifier
             .wrapContentSize()
@@ -140,7 +154,7 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}) {
                 top = dimensionResource(R.dimen.ten)
             ),
         elevation = CardDefaults.outlinedCardElevation(dimensionResource(id = R.dimen.eight)),
-        ) {
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,13 +168,14 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}) {
                     .padding(dimensionResource(id = R.dimen.five)),
                 horizontalArrangement = Arrangement.End
             ) {
-                Icon(painter = if (colorChange) painterResource(id = R.drawable.baseline_favorite_24) else painterResource(
-                    id = R.drawable.baseline_favorite_24
-                ), contentDescription = null, modifier = Modifier
-                    .wrapContentSize()
-                    .clickable {
-                        colorChange = !colorChange
-                    }, tint = if (colorChange) Color.Red else Color.Gray
+                Icon(
+                    painter = if (colorChange) painterResource(id = R.drawable.baseline_favorite_24) else painterResource(
+                        id = R.drawable.baseline_favorite_24
+                    ), contentDescription = null, modifier = Modifier
+                        .wrapContentSize()
+                        .clickable {
+                            colorChange = !colorChange
+                        }, tint = if (colorChange) Color.Red else Color.Gray
                 )
             }
 
@@ -194,18 +209,18 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}) {
                 )
                 Row {
                     Text(
-                        text ="Rs:${item.price.toDouble()}",
+                        text = "Rs:${item.price.toDouble()}",
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .wrapContentSize()
                             .clickable {})
                     Text(
-                        text ="(${item.discountPercentage}% off)",
+                        text = "(${item.discountPercentage}% off)",
                         fontWeight = FontWeight.Bold,
                         color = Color.Red,
                         modifier = Modifier.padding(start = dimensionResource(id = R.dimen.ten)),
                         maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -239,7 +254,7 @@ fun Categories(
     navController: NavHostController
 
 ) {
-    val context= LocalContext.current
+    val context = LocalContext.current
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
