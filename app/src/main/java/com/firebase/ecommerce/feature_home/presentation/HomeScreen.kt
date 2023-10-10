@@ -55,6 +55,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
+import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.data.Categories
 import com.firebase.ecommerce.feature_home.domain.HomeData
@@ -71,27 +72,27 @@ fun HomeScreenPreview(navController: NavHostController) {
             Categories(
                 title = stringResource(id = R.string.getTheBestElectronics),
                image =  painterResource(id = R.drawable.electronic_image),
-                color = Color.Yellow.copy(alpha = 0.3f),100
+                color = Color.Yellow.copy(alpha = 0.3f),Constants.ELECTRONICS
             ),
             Categories(
                 title=stringResource(id = R.string.getTheBestMenShopping),
                 image = painterResource(id = R.drawable.men_transformed),
-                color = Color(0xff85C1E9 ).copy(alpha = 0.2f),500
+                color = Color(0xff85C1E9 ).copy(alpha = 0.2f),Constants.MEN
             ),
             Categories(
                 title= stringResource(id = R.string.getTheBestWomenShopping),
                image =  painterResource(id = R.drawable.women),
-                color = Color(0xffF1948A).copy(alpha = 0.2f),1000
+                color = Color(0xffF1948A).copy(alpha = 0.2f),Constants.WOMEN
             ),
             Categories(
                 title =stringResource(id = R.string.getTheBestSkinCare) ,
                image =  painterResource(id = R.drawable.skincare),
-                color = Color(0xff82E0AA).copy(alpha = 0.3f),1500
+                color = Color(0xff82E0AA).copy(alpha = 0.3f),Constants.SKINCARE
             ),
             Categories(
                 title = stringResource(id = R.string.homeAndDecor),
                 image = painterResource(id = R.drawable.home),
-                color = Color(0xffAEB6BF).copy(alpha = 0.2f),2000
+                color = Color(0xffAEB6BF).copy(alpha = 0.2f),Constants.HOMEDECORE
             )
         ),navController
     )
@@ -129,7 +130,10 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
         var showDialog by remember {
             mutableStateOf(true)
         }
-        CustomDialogBox(message = "on internet please turn on internet", onCancelButtonClick = {showDialog=false}, showDialog = showDialog)
+        CustomDialogBox(
+            message = stringResource(id = R.string.NoInternet),
+            onCancelButtonClick = {showDialog=false},
+            showDialog = showDialog)
     }
     Column(modifier=Modifier.fillMaxSize()) {
         Row(
@@ -146,7 +150,7 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                 modifier = Modifier
                     .size(dimensionResource(id = R.dimen.fifty))
                     .clip(CircleShape)
-                    .border(4.dp, Color.Gray, CircleShape)
+                    .border(dimensionResource(id = R.dimen.four), Color.Gray, CircleShape)
             )
             AssistChip(
                 onClick = {  },
@@ -184,18 +188,21 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
 
 
             ) {
-            LazyColumn(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f), state = scrollState) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                state = scrollState
+            ) {
                 items(categories) {
                     SingleItem(
                         title = it.title,
                         image = it.image,
                         cardColor = it.color,
-
                         onItemClick = {
+                            navController.setData(Constants.apiParameterKey,it.category)
                             navController.navigate(NavRoute.ItemScreen.route)
-                        }, delay = it.delay
+                        },
                     )
                 }
 
@@ -207,15 +214,8 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
 
 
 @Composable
-fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->Unit={},delay: Long) {
+fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->Unit={}) {
 
-    var visible by remember {
-        mutableStateOf(false)
-    }
-    LaunchedEffect(Unit) {
-        delay(delay)
-        visible=true
-    }
         Card(
             modifier = Modifier
                 .wrapContentSize()
@@ -251,14 +251,13 @@ fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->U
                         .fillMaxHeight()
                         .padding(dimensionResource(R.dimen.five))
                 )
-
-
                 Column(
                    modifier= Modifier
                        .fillMaxWidth()
                        .weight(2f)
                        .fillMaxHeight()
-                       .padding(start = dimensionResource(R.dimen.ten)), verticalArrangement = Arrangement.Center
+                       .padding(start = dimensionResource(R.dimen.ten)),
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = title,
@@ -266,18 +265,20 @@ fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->U
                         modifier = Modifier.padding(bottom = dimensionResource(R.dimen.ten))
                     )
                     Text(
-                        text="Show Now",
+                        text= stringResource(id = R.string.show_now),
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .wrapContentSize()
-                            .clickable {
-
-                            })
+                            .clickable {})
                 }
             }
         }
 }
 
 
+
+fun <T>NavHostController.setData(key: String, value: T){
+    currentBackStackEntry?.savedStateHandle?.set(key, value)
+}
 
 

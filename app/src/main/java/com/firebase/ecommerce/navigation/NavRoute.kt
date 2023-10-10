@@ -5,4 +5,5 @@ sealed class  NavRoute(val route:String) {
     object LoginScreen:NavRoute("login")
     object HomeScreen:NavRoute("home")
     object ItemScreen:NavRoute("items")
+    object DetailsScreen:NavRoute("Details")
 }
