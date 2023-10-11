@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class SaveUserDetailsUseCase @Inject constructor(private val profileRepository: ProfileRepository) {
-    suspend fun saveUserDetails(context: Context, profileModel: ProfileModel): Flow<Resource<Any>> {
-        return profileRepository.saveUserDetailsInFireStore(context, profileModel)
+    suspend operator fun invoke( profileModel: ProfileModel): Flow<Resource<Any>> {
+        return profileRepository.saveUserDetailsInFireStore( profileModel)
     }
 }

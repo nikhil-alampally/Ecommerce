@@ -8,6 +8,7 @@ import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
 import com.firebase.ecommerce.feature_login.domain.repository.RegistrationRepository
+import com.firebase.ecommerce.feature_login.domain.use_case.ResetPasswordUseCase
 import com.firebase.ecommerce.feature_login.domain.use_case.StoringGoogleSignInDataIntoFireStoreUseCase
 import com.firebase.ecommerce.feature_login.presentation.SignInState
 import com.google.firebase.auth.AuthCredential
@@ -21,7 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val repository: RegistrationRepository,private val dataStore:StoreData,
-    private val storingGoogleSignInDataIntoFireStoreUseCase: StoringGoogleSignInDataIntoFireStoreUseCase
+    private val storingGoogleSignInDataIntoFireStoreUseCase: StoringGoogleSignInDataIntoFireStoreUseCase,
+
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ) : ViewModel() {
     private val _signInState = Channel<SignInState>()
     val signInState = _signInState.receiveAsFlow()
@@ -29,6 +32,11 @@ class LoginViewModel @Inject constructor(
     val googleSignInState = _googleSignInState.receiveAsFlow()
     private val _googleSignDataState = Channel<SignInState>()
     val googleSignDataState = _googleSignDataState.receiveAsFlow()
+
+    private val _passwordResetState = Channel<SignInState>()
+    val passwordResetState = _passwordResetState.receiveAsFlow()
+
+
 
     fun loginUser(email: String, password: String) = viewModelScope.launch {
         repository.loginUser(email, password).collect { result ->
@@ -75,7 +83,6 @@ class LoginViewModel @Inject constructor(
                 }
         }
 
-
     fun signWithGoogle(credential: AuthCredential) = viewModelScope.launch {
         repository.signInWithGoogle(credential).collect { result ->
             when (result) {
@@ -93,4 +100,23 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    fun resetPassword(email: String)=
+        viewModelScope.launch {
+            resetPasswordUseCase.resetPassword(email)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                           // _googleSignDataState.send(SignInState(isSuccess = context.getString(R.string.successfullyLoggedIn)))
+                        }
+                        is Resource.Loading -> {
+                           // _googleSignDataState.send(SignInState(isLoading = true))
+                        }
+                        is Resource.Error -> {
+                          //  _googleSignDataState.send(SignInState(isError = result.message))
+                        }
+                    }
+                }
+        }
+
 }

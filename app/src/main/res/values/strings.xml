@@ -43,4 +43,9 @@
     <string name="NoInternet">no internet please turn on internet</string>
     <string name="RegistrationSuccessfullyDoneLoginToAccess">registration successfully done login to access</string>
     <string name="successfullyStored">Successfully Stored</string>
+    <string name="logout">Logout</string>
+    <string name="change_password">Change Password</string>
+    <string name="choose_from_camera">Choose from Camera</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="save">Save</string>
 </resources>

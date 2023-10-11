@@ -10,10 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface ProfileRepository {
     suspend fun addImageToFirebaseStorage(imageUri: Uri): Flow<Resource<Any>>
 
-    suspend fun addImageUrlToFirestore(downloadUrl: Uri): Flow<Resource<Boolean>>
-
     suspend fun getImageUrlFromFirestore(): Flow<Resource<String>>
 
-    suspend fun saveUserDetailsInFireStore(context: Context,profileModel: ProfileModel): Flow<Resource<Any>>
+    suspend fun saveUserDetailsInFireStore(profileModel: ProfileModel): Flow<Resource<Any>>
 
 }

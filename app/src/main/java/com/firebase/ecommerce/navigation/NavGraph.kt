@@ -6,11 +6,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import com.firebase.ecommerce.ItemScreen
+import com.firebase.ecommerce.feature_home.domain.HomeData
 import com.firebase.ecommerce.feature_home.presentation.HomeScreenPreview
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
+import com.firebase.ecommerce.feature_profile.presentation.ProfileScreen
+import com.firebase.ecommerce.feature_profile.presentation.getData
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -58,6 +62,13 @@ fun NavGraph() {
                 slideOutVertically(targetOffsetY = { 3000 }, animationSpec = tweenSpec)
             }) {
             ItemScreen()
+        }
+        composable(NavRoute.ProfileScreen.route) {
+            val context = LocalContext.current
+            val profileData = navController.getData<HomeData>("profile_details")
+            if (profileData != null) {
+                ProfileScreen(navController = navController, profileData = profileData )
+            }
         }
 
     }

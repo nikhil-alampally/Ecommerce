@@ -7,6 +7,7 @@ import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_login.data.model.RegisterDto
 import com.firebase.ecommerce.feature_login.data.model.toDomain
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.domain.repository.RegistrationRepository
@@ -72,6 +73,24 @@ class RegistrationRepositoryImp @Inject constructor(
             emit(Resource.Error(message = it.message.toString()))
         }
     }
+
+    override fun initiatePasswordReset(email: String): Flow<Resource<AuthResult>> {
+        return flow {
+            firebaseAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Password reset email sent successfully
+                        // Show a success message or navigate to a confirmation screen
+                    } else {
+                        // Handle password reset failure
+                        val exception = task.exception
+                        // Show an error message to the user
+                    }
+                }
+        }
+
+    }
+
 
     override fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>> {
         return flow {

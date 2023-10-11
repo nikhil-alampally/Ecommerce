@@ -1,11 +1,13 @@
-package com.firebase.ecommerce.feature_profile.new_presentation
+package com.firebase.ecommerce.feature_profile.presentation
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,21 +21,27 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,39 +51,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
 import com.firebase.ecommerce.feature_profile.domain.model.ProfileModel
-import com.firebase.ecommerce.feature_profile.presentation.profileViewModel.ProfileViewModel
+import com.firebase.ecommerce.navigation.NavRoute
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
-fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel()) {
+fun ProfileScreen(
+    navController: NavHostController,
+    viewModel: ProfileViewModel = hiltViewModel(),
+    loginModel: LoginViewModel = hiltViewModel(),
+    profileData: HomeData,
+) {
 
-    var userName by remember { mutableStateOf("John Richard") }
     var isUserNameEditing by remember { mutableStateOf(false) }
 
-    var mobileNumber by remember { mutableStateOf("+34 456 321 8720") }
     var isMobileNumberEditing by remember { mutableStateOf(false) }
 
-    val email by remember { mutableStateOf("ankita@gmail.com") }
-    val gender by remember { mutableStateOf("Female") }
+    var isImageUpdating by remember { mutableStateOf(false) }
 
     val customTextFieldColors = TextFieldDefaults.textFieldColors(
         containerColor = Color.Transparent
     )
+
     val galleryLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
             imageUri?.let {
-                viewModel.addImageUriToStorage(imageUri)
+                viewModel.setImage(it)
             }
         }
 
@@ -83,8 +104,7 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
         rememberLauncherForActivityResult(contract = ActivityResultContracts.TakePicturePreview(),
             onResult = {
                 if (it != null) {
-
-                    viewModel.addImageUriToStorage(toBitmapImageToUri(context, it))
+                    viewModel.setImage(it)
                 }
             })
     val modalBottomSheetState =
@@ -92,24 +112,20 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
             confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
         )
 
+
     val scope = rememberCoroutineScope()
 
-    val profileModel = ProfileModel(
-        email = email,
-        mobileNumber = mobileNumber,
-        gender = gender,
-        userName = userName,
-    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xfff1e4e0)) // Background color for the entire box
+            .background(color = Color(0xfff1e4e0))
             .padding(
                 start = 4.dp,
                 top = 4.dp,
                 end = 4.dp,
             )
-        // .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState())
     )
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
@@ -128,7 +144,7 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    androidx.compose.material3.Text("Choose from Gallery")
+                    androidx.compose.material3.Text(stringResource(R.string.choose_from_gallery))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
@@ -140,7 +156,7 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    androidx.compose.material3.Text("Choose from Camera")
+                    androidx.compose.material3.Text(stringResource(R.string.choose_from_camera))
                 }
             }
         }
@@ -149,9 +165,8 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-              //  .clip(shape = RoundedCornerShape(topStart = 50.dp, topEnd = 30.dp))
                 .background(
-                    color = Color(0xfffc7a5a),/* shape = RoundedCornerShape(25.dp)*/
+                    color = Color(0xff495d92),
                 ),
         ) {
             Box(
@@ -164,36 +179,45 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 25.dp, end = 25.dp, top = 70.dp)
+                        .padding(start = 25.dp, end = 25.dp, top = 80.dp)
                 ) {
                     if (isUserNameEditing) {
-                        TextField(
-                            value = userName,
-                            onValueChange = { newValue ->
-                                userName = newValue
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 25.sp,
-                                color = Color.Black
-                            ),
-                            colors = customTextFieldColors,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .height(60.dp)
+                        viewModel.getHomeDataState.value?.userName?.let {
+                            TextField(
+                                value = viewModel.getHomeDataState.value!!.userName!!,
+                                onValueChange = { newValue ->
+                                    viewModel.updateUsername(newValue)
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 25.sp,
+                                    color = Color.Black
+                                ),
+                                colors = customTextFieldColors,
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally)
+                                    .height(60.dp)
 
-                        )
+                            )
+
+                        }
                     } else {
-                        Text(
-                            text = userName,
-                            fontSize = 25.sp,
-                            modifier = Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .height(60.dp),
-                            fontWeight = FontWeight.Bold
-                        )
+                        viewModel.getHomeDataState.value?.userName?.let {
+                            viewModel.getHomeDataState.value!!.userName.let { it1 ->
+                                if (it1 != null) {
+                                    Text(
+                                        text = it1,
+                                        fontSize = 25.sp,
+                                        modifier = Modifier
+                                            .align(Alignment.CenterHorizontally)
+                                            .height(60.dp),
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                            }
+                        }
                     }
 
-                    Spacer(modifier = Modifier.size(50.dp))
+                    Spacer(modifier = Modifier.size(20.dp))
 
                     Card(
                         modifier = Modifier
@@ -214,12 +238,14 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                                     .padding(start = 10.dp)
                             )
                             Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = gender,
-                                textAlign = TextAlign.Start,
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                            )
+                            viewModel.getHomeDataState.value?.gender?.let {
+                                Text(
+                                    text = it,
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                )
+                            }
                         }
 
                     }
@@ -243,13 +269,15 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                                     .padding(start = 10.dp)
                             )
                             Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = email,
-                                textAlign = TextAlign.Start,
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                                modifier = Modifier.offset(0.dp, -2.dp)
-                            )
+                            viewModel.getHomeDataState.value?.email?.let {
+                                Text(
+                                    text = it,
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                    modifier = Modifier.offset(0.dp, -2.dp)
+                                )
+                            }
                         }
 
                     }
@@ -274,27 +302,35 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                             )
                             Spacer(modifier = Modifier.size(10.dp))
                             if (isMobileNumberEditing) {
-                                TextField(
-                                    value = mobileNumber,
-                                    onValueChange = { newValue ->
-                                        mobileNumber = newValue
-                                    },
-                                    textStyle = TextStyle(fontSize = 16.sp, color = Color.Black),
-                                    colors = customTextFieldColors,
-                                    modifier = Modifier
-                                        .height(50.dp)
-                                )
+                                viewModel.getHomeDataState.value?.mobileNumber?.let {
+                                    TextField(
+                                        value = viewModel.getHomeDataState.value!!.mobileNumber!!,
+                                        onValueChange = { newValue ->
+                                            viewModel.updateMobileNumber(newValue)
+                                        },
+                                        textStyle = TextStyle(
+                                            fontSize = 16.sp,
+                                            color = Color.Black
+                                        ),
+                                        colors = customTextFieldColors,
+                                        modifier = Modifier
+                                            .height(50.dp)
+                                    )
+                                }
                             } else {
-                                Text(
-                                    text = mobileNumber,
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    color = Color.Black,
-                                  //  modifier = Modifier.height(50.dp)
-                                )
+                                viewModel.getHomeDataState.value?.mobileNumber?.let {
+                                    viewModel.getHomeDataState.value!!.mobileNumber?.let { it1 ->
+                                        Text(
+                                            text = it1,
+                                            textAlign = TextAlign.Start,
+                                            fontSize = 16.sp,
+                                            color = Color.Black,
+                                        )
+                                    }
+                                }
+
                             }
                         }
-
                     }
                     Spacer(modifier = Modifier.size(20.dp))
                     Card(
@@ -315,13 +351,21 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                                     .size(32.dp)
                                     .padding(start = 10.dp)
                             )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = "Change Password",
-                                textAlign = TextAlign.Start,
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                            )
+                            Spacer(modifier = Modifier.size(3.dp))
+                            TextButton(onClick = {
+                                viewModel.getHomeDataState.value?.email?.let {
+                                    loginModel.resetPassword(
+                                        email = it
+                                    )
+                                }
+                            }) {
+                                Text(
+                                    text = stringResource(R.string.change_password),
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.size(20.dp))
@@ -343,55 +387,65 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                                     .size(32.dp)
                                     .padding(start = 10.dp)
                             )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            Text(
-                                text = "Logout",
-                                textAlign = TextAlign.Start,
-                                fontSize = 16.sp,
-                                color = Color.Black,
-                            )
+                            Spacer(modifier = Modifier.size(3.dp))
+                            TextButton(onClick = {
+                                viewModel.deleteUserName()
+                                navController.navigate(NavRoute.LoginScreen.route)
+                            }) {
+                                Text(
+                                    text = stringResource(R.string.logout),
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    color = Color.Black,
+                                )
+                            }
                         }
-                    }/*  Button(
-                          modifier = Modifier
-                              .padding(start = 130.dp, end = 60.dp)
-                              .clip(RoundedCornerShape(8.dp)),
-                          onClick = {
-                              isMobileNumberEditing = false
-                              isUserNameEditing = false
-                              //   viewModel.saveUserDetails(profileModel,context)
-                          },
-                          enabled = isMobileNumberEditing,
-                          colors = ButtonDefaults.buttonColors(
-                              containerColor = MaterialTheme.colorScheme.primary
-                          ), shape = RoundedCornerShape(15.dp)
-                      ) {
-                          androidx.compose.material3.Text("Save", modifier = Modifier.padding(10.dp))
-                      }
-  */
+                    }
+                    Spacer(modifier = Modifier.size(5.dp))
+                    Button(
+                        modifier = Modifier
+                            .padding(start = 130.dp, end = 60.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        onClick = {
+                            isMobileNumberEditing = false
+                            isUserNameEditing = false
+                        //    isImageUpdating = false
+
+                            viewModel.saveProfileData()
+                        },
+                        enabled = isMobileNumberEditing || isImageUpdating,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        ), shape = RoundedCornerShape(15.dp)
+                    ) {
+                        androidx.compose.material3.Text(stringResource(R.string.save))
+                    }
                 }
             }
             Box(
                 modifier = Modifier
                     .padding(top = 180.dp)
-                    .height(100.dp)
-                    .width(100.dp)
+                    .height(120.dp)
+                    .width(120.dp)
                     .align(Alignment.TopCenter)
-                    .offset(x = (7).dp, y = (-40).dp)
+                    .offset(x = (7).dp, y = (-50).dp)
                     .clip(RoundedCornerShape(30.dp)),
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.img),
-                    contentDescription = "",
-                    modifier = Modifier.fillMaxSize()
+                AsyncImage(
+                    model = viewModel.profileImage.value,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
                 )
             }
             Card(
                 modifier = Modifier
                     .size(40.dp)
                     .align(Alignment.Center)
-                    .offset(40.dp, -200.dp),
+                    .offset(45.dp, -160.dp),
                 border = BorderStroke(1.dp, Color.White),
-                colors = CardDefaults.cardColors(containerColor = Color(0xfffc7a5a)),
+                colors = CardDefaults.cardColors(containerColor = Color(0xff495d92)),
                 shape = CircleShape,
             ) {
                 Icon(painter = painterResource(id = R.drawable.baseline_photo_camera_24),
@@ -402,6 +456,7 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                         .align(Alignment.CenterHorizontally)
                         .clickable {
                             scope.launch {
+                                isImageUpdating = true
                                 modalBottomSheetState.show()
                             }
                         })
@@ -410,7 +465,7 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
                 modifier = Modifier
                     .size(40.dp)
                     .align(Alignment.CenterEnd)
-                    .offset(x = (-55).dp, y = (-235).dp),
+                    .offset(x = (-55).dp, y = (-210).dp),
                 elevation = CardDefaults.cardElevation(15.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
@@ -430,6 +485,18 @@ fun ProfileScreen(context: Context, viewModel: ProfileViewModel = hiltViewModel(
             }
         }
     }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.setHomeData(profileData)
+    }
 }
+
+fun <T> NavHostController.setData(key: String, value: T) {
+    currentBackStackEntry?.savedStateHandle?.set(key, value)
+}
+
+fun <T> NavHostController.getData(key: String): T? {
+    return previousBackStackEntry?.savedStateHandle?.get<T>(key)
+}
+
 
 
