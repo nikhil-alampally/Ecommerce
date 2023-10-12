@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.firebase.ecommerce.core.Constants
-import com.firebase.ecommerce.core.Constants.CREATED_AT
 import com.firebase.ecommerce.core.Constants.PROFILE
 import com.firebase.ecommerce.core.Constants.PROFILE_IMAGE_NAME
 import com.firebase.ecommerce.core.Constants.UID

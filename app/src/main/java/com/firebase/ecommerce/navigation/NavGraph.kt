@@ -8,11 +8,15 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
-import com.firebase.ecommerce.ItemScreen
+import androidx.navigation.NavHostController
+import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.feature_products.presentation.screens.DetailScreen
+import com.firebase.ecommerce.feature_products.presentation.screens.ItemScreen
 import com.firebase.ecommerce.feature_home.domain.HomeData
 import com.firebase.ecommerce.feature_home.presentation.HomeScreenPreview
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
+import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_profile.presentation.ProfileScreen
 import com.firebase.ecommerce.feature_profile.presentation.getData
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -61,7 +65,20 @@ fun NavGraph() {
                 targetState
                 slideOutVertically(targetOffsetY = { 3000 }, animationSpec = tweenSpec)
             }) {
-            ItemScreen()
+            navController.getData<String>(Constants.apiParameterKey).let{
+                if(it!=null){
+                    ItemScreen(category = it, navController =navController, onItemClick = {
+                        navController.navigate(NavRoute.DetailsScreen.route)
+                    })
+                }
+            }
+        }
+        composable(NavRoute.DetailsScreen.route){
+            navController.getData<Product>(Constants.ITEMSLIST).let{
+                if (it != null) {
+                    DetailScreen(it,navController)
+                }
+            }
         }
         composable(NavRoute.ProfileScreen.route) {
             val context = LocalContext.current
@@ -74,3 +91,7 @@ fun NavGraph() {
     }
 }
 
+fun <T> NavHostController.getData(key: String): T? {
+    return previousBackStackEntry?.savedStateHandle?.get<T>(key)
+
+}
