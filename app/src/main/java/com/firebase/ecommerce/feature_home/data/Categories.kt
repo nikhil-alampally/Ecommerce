@@ -7,7 +7,7 @@ data class Categories(
     val title: String,
     val image: Painter,
     val color: Color,
-    val delay: Long
+    val category:String
 ) {
 
 }

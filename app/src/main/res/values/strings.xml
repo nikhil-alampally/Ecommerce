@@ -43,4 +43,7 @@
     <string name="NoInternet">no internet please turn on internet</string>
     <string name="RegistrationSuccessfullyDoneLoginToAccess">registration successfully done login to access</string>
     <string name="successfullyStored">Successfully Stored</string>
+    <string name="show_now">Show Now</string>
+    <string name="addToCart">Add to cart</string>
+    <string name="all">All</string>
 </resources>

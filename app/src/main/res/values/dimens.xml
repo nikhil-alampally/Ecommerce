@@ -17,5 +17,8 @@
     <dimen name="sixty">60.dp</dimen>
     <dimen name="fifty">50.dp</dimen>
     <dimen name="oneFifty">150.dp</dimen>
+    <dimen name="twoHundred">200.dp</dimen>
+    <dimen name="twoEighty">280.dp</dimen>
+    <dimen name="four">4.dp</dimen>
 
 </resources>
