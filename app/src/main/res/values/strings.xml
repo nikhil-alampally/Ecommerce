@@ -44,8 +44,11 @@
     <string name="RegistrationSuccessfullyDoneLoginToAccess">registration successfully done login to access</string>
     <string name="successfullyStored">Successfully Stored</string>
     <string name="logout">Logout</string>
-    <string name="change_password">Change Password</string>
+    <string name="update_password">Update Password</string>
     <string name="choose_from_camera">Choose from Camera</string>
     <string name="choose_from_gallery">Choose from Gallery</string>
     <string name="save">Save</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="update">Update</string>
+    <string name="new_password">New Password</string>
 </resources>

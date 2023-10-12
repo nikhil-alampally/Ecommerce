@@ -10,6 +10,5 @@ data class HomeData(
     var mobileNumber:String?=null,
     val gender:String?=null,
     var userName:String?=null,
-    val image:String="https://firebasestorage.googleapis.com/v0/b/ecommerce-b13bb.appspot.com/o/Profile%2Fprofile_image.jpg?alt=media&token=0b671803-1084-4bdc-8c36-206ecda5cab5"
-): Parcelable {
+    val image:String="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250"): Parcelable {
 }

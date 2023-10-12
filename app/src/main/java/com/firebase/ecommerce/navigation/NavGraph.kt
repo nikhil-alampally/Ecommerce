@@ -67,7 +67,7 @@ fun NavGraph() {
             val context = LocalContext.current
             val profileData = navController.getData<HomeData>("profile_details")
             if (profileData != null) {
-                ProfileScreen(navController = navController, profileData = profileData )
+                ProfileScreen(navController = navController, profileData = profileData, context = context )
             }
         }
 

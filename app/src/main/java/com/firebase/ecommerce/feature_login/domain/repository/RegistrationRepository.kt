@@ -15,5 +15,5 @@ interface RegistrationRepository {
     fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>>
     fun addDetailsIntoFireStore(homeData: HomeDataDto):Flow<Resource<Any>>
 
-    fun initiatePasswordReset(email: String):Flow<Resource<AuthResult>>
+    fun updateUserPassword(newPassword:String,confirmPassword:String):Flow<Resource<AuthResult>>
 }

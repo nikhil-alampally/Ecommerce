@@ -22,11 +22,4 @@ class StoreData @Inject constructor( private val dataStore: DataStore<Preference
             preferences[USERNAME]=name
         }
     }
-
-    suspend fun clearUserData() {
-        dataStore.edit { preferences ->
-            preferences[USERNAME] = ""
-        }
-    }
-
 }

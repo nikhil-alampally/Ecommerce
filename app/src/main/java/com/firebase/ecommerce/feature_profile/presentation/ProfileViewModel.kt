@@ -11,7 +11,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.domain.HomeData
@@ -50,6 +49,7 @@ class ProfileViewModel @Inject constructor(
     fun updateMobileNumber(number: String) {
         _getHomeDataState.value = _getHomeDataState.value?.copy(mobileNumber = number)
     }
+
     fun updateUsername(name: String) {
         _getHomeDataState.value = _getHomeDataState.value?.copy(userName = name)
     }
@@ -58,6 +58,7 @@ class ProfileViewModel @Inject constructor(
         _getHomeDataState.value = homeData
         _profileImage.value = homeData.image
     }
+
     fun setImage(imageUri: Uri) {
         _profileImage.value = imageUri
     }
@@ -92,8 +93,10 @@ class ProfileViewModel @Inject constructor(
                     is Resource.Success -> {
                         getImageUrlFromDatabase()
                     }
+
                     is Resource.Error -> {
                     }
+
                     is Resource.Loading -> {
                     }
                 }
@@ -111,15 +114,12 @@ class ProfileViewModel @Inject constructor(
                     }
 
                     is Resource.Loading -> {
-//                        _getImageUrl.value = _getImageUrl.value.copy(isLoading = true)
+
 
                     }
 
                     is Resource.Error -> {
-                        /*   _getImageUrl.value = _getImageUrl.value.copy(
-                               isLoading = false,
-                               errorMessage = it.message.orEmpty()
-                           )*/
+
                     }
                 }
             }.launchIn(this)
@@ -141,10 +141,12 @@ class ProfileViewModel @Inject constructor(
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            Toast.makeText(application, "Successfully saved data", Toast.LENGTH_SHORT).show()               }
+                            Toast.makeText(application, result.data.toString(), Toast.LENGTH_SHORT)
+                                .show()
+                        }
 
                         is Resource.Loading -> {
-                              _signInState.send(ProfileSignInState(isLoading = true))
+                            _signInState.send(ProfileSignInState(isLoading = true))
                         }
 
                         is Resource.Error -> {
@@ -163,9 +165,10 @@ class ProfileViewModel @Inject constructor(
         )
         return Uri.parse(path)
     }
+
     fun deleteUserName() {
         viewModelScope.launch {
-            dataStore.clearUserData()
+            dataStore.saveData("")
         }
     }
 }

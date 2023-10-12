@@ -2,12 +2,9 @@ package com.firebase.ecommerce.feature_login.data.repository
 
 
 
-import android.content.Context
-import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
-import com.firebase.ecommerce.feature_login.data.model.RegisterDto
 import com.firebase.ecommerce.feature_login.data.model.toDomain
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.domain.repository.RegistrationRepository
@@ -74,22 +71,24 @@ class RegistrationRepositoryImp @Inject constructor(
         }
     }
 
-    override fun initiatePasswordReset(email: String): Flow<Resource<AuthResult>> {
+    override fun updateUserPassword(newPassword: String,confirmPassword:String): Flow<Resource<AuthResult>> {
         return flow {
-            firebaseAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Password reset email sent successfully
-                        // Show a success message or navigate to a confirmation screen
-                    } else {
-                        // Handle password reset failure
-                        val exception = task.exception
-                        // Show an error message to the user
-                    }
-                }
-        }
+            emit(Resource.Loading())
+            try {
+                val user = firebaseAuth.currentUser
 
+                if (user != null) {
+                    user.updatePassword(newPassword).await()
+                    emit(Resource.Success(null))
+                } else {
+                    emit(Resource.Error(message = "User not authenticated"))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage.orEmpty()))
+            }
+        }
     }
+
 
 
     override fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>> {

@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,9 +23,11 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
@@ -37,6 +41,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -46,6 +51,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,20 +59,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_login.presentation.screens.LoadingButton
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
 import com.firebase.ecommerce.feature_profile.domain.model.ProfileModel
 import com.firebase.ecommerce.navigation.NavRoute
@@ -77,11 +91,13 @@ import java.io.ByteArrayOutputStream
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ProfileScreen(
+    context: Context,
     navController: NavHostController,
     viewModel: ProfileViewModel = hiltViewModel(),
     loginModel: LoginViewModel = hiltViewModel(),
     profileData: HomeData,
 ) {
+    var isDialogVisible by remember { mutableStateOf(false) }
 
     var isUserNameEditing by remember { mutableStateOf(false) }
 
@@ -111,10 +127,7 @@ fun ProfileScreen(
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden,
             confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded }
         )
-
-
     val scope = rememberCoroutineScope()
-
 
     Box(
         modifier = Modifier
@@ -196,9 +209,7 @@ fun ProfileScreen(
                                 modifier = Modifier
                                     .align(Alignment.CenterHorizontally)
                                     .height(60.dp)
-
                             )
-
                         }
                     } else {
                         viewModel.getHomeDataState.value?.userName?.let {
@@ -218,6 +229,15 @@ fun ProfileScreen(
                     }
 
                     Spacer(modifier = Modifier.size(20.dp))
+
+                    PasswordUpdateDialog(
+                        context = context,
+                        showDialog = isDialogVisible,
+                        onDismiss = { isDialogVisible = false },
+                        onUpdatePassword = { newPassword, confirmPassword ->
+                            loginModel.updatePassword(newPassword, confirmPassword)
+                        }
+                    )
 
                     Card(
                         modifier = Modifier
@@ -353,14 +373,11 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.size(3.dp))
                             TextButton(onClick = {
-                                viewModel.getHomeDataState.value?.email?.let {
-                                    loginModel.resetPassword(
-                                        email = it
-                                    )
-                                }
-                            }) {
+                                isDialogVisible = true
+                            }
+                            ) {
                                 Text(
-                                    text = stringResource(R.string.change_password),
+                                    text = stringResource(R.string.update_password),
                                     textAlign = TextAlign.Start,
                                     fontSize = 16.sp,
                                     color = Color.Black,
@@ -409,7 +426,7 @@ fun ProfileScreen(
                         onClick = {
                             isMobileNumberEditing = false
                             isUserNameEditing = false
-                        //    isImageUpdating = false
+                            //    isImageUpdating = false
 
                             viewModel.saveProfileData()
                         },
@@ -496,6 +513,241 @@ fun <T> NavHostController.setData(key: String, value: T) {
 
 fun <T> NavHostController.getData(key: String): T? {
     return previousBackStackEntry?.savedStateHandle?.get<T>(key)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PasswordUpdateDialog(
+    context: Context,
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onCancelButtonClick: () -> Unit = {},
+    onUpdatePassword: (newPassword: String, confirmPassword: String) -> Unit,
+) {
+    var showPassword by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var showConfirmPassword by rememberSaveable {
+        mutableStateOf(false)
+    }
+    var newPassword = remember { mutableStateOf("") }
+    var confirmPassword = remember { mutableStateOf("") }
+
+    var passwordsMatch by remember { mutableStateOf(true) }
+
+    if (showDialog) {
+
+        Dialog(
+            onDismissRequest = { onDismiss() }
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(26.dp)
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.White,
+                            shape = RoundedCornerShape(percent = 10)
+                        )
+                ) {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = newPassword.value,
+                        onValueChange = { newValue ->
+                            newPassword.value = newValue
+                            passwordsMatch = newValue == confirmPassword.value
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_lock_24),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .clickable {
+                                        showPassword = !showPassword
+                                    }
+                                    .size(dimensionResource(id = R.dimen.twenty)),
+                                tint = Color.Black.copy(alpha = 0.5f)
+                            )
+                        },
+                        supportingText = {
+                            if (newPassword.value.length < 6 && newPassword.value.isNotEmpty()) {
+                                androidx.compose.material3.Text(
+                                    stringResource(R.string.mininmum_length_of_password_is_6),
+                                    color = Color.Red
+                                )
+                            }
+
+                        },
+                        placeholder = { Text(text = stringResource(R.string.new_password)) },
+                        trailingIcon = {
+                            if (showPassword) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.hide_password),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .clickable {
+                                            showPassword = !showPassword
+                                        }
+                                        .size(dimensionResource(id = R.dimen.twentyFive)),
+                                    tint = Color.Black.copy(alpha = 0.5f)
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.password),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .clickable {
+                                            showPassword = !showPassword
+                                        }
+                                        .size(dimensionResource(id = R.dimen.twentyFive)),
+                                    tint = Color.Black.copy(alpha = 0.5f)
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                        ),
+                        visualTransformation =
+                        if (!showPassword) {
+                            PasswordVisualTransformation()
+                        } else VisualTransformation.None,
+                        maxLines = 1,
+                        singleLine = true,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = if (newPassword.value.length < 6) Color.Red else Color.LightGray
+                        ),
+
+                        )
+
+                    OutlinedTextField(
+                        value = confirmPassword.value,
+                        onValueChange = { newValue ->
+                            confirmPassword.value = newValue
+                            passwordsMatch = newValue == newPassword.value
+                        },
+                        supportingText = {
+                            if (newPassword.value != confirmPassword.value && confirmPassword.value.isNotEmpty()) {
+                                androidx.compose.material3.Text(
+                                    text = stringResource(id = R.string.passwordMismatch),
+                                    color = Color.Red
+                                )
+                            }
+                        },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = if (newPassword != confirmPassword) Color.Red else Color.LightGray
+                        ),
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_lock_24),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .wrapContentSize()
+                                    .size(dimensionResource(id = R.dimen.twenty)),
+                                tint = Color.Black.copy(alpha = 0.5f)
+                            )
+                        },
+                        placeholder = { Text(text = stringResource(R.string.confirm_password)) },
+                        trailingIcon = {
+                            if (showConfirmPassword) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.hide_password),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .clickable {
+                                            showConfirmPassword = !showConfirmPassword
+                                        }
+                                        .size(dimensionResource(id = R.dimen.twentyFive)),
+                                    tint = Color.Black.copy(alpha = 0.5f)
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.password),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .wrapContentSize()
+                                        .clickable {
+                                            showConfirmPassword = !showConfirmPassword
+                                        }
+                                        .size(dimensionResource(id = R.dimen.twentyFive)),
+                                    tint = Color.Black.copy(alpha = 0.5f)
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrect = true,
+                            keyboardType = KeyboardType.Password,
+                        ),
+                        visualTransformation =
+                        if (!showConfirmPassword) {
+                            PasswordVisualTransformation()
+                        } else VisualTransformation.None,
+                        maxLines = 1,
+                        singleLine = true,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        onClick = {
+                            if (passwordsMatch) {
+                                onUpdatePassword(newPassword.value, confirmPassword.value)
+                                Toast.makeText(context, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                                onDismiss()
+                            }
+                        },
+                        enabled = newPassword.value.isNotEmpty() && confirmPassword.value.isNotEmpty() && passwordsMatch
+                    ) {
+                        Text(
+                            text = stringResource(R.string.update),
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                Icon(
+                    painter = painterResource(id = R.drawable.cancelbutton),
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .background(
+                            color = Color.White,
+                            shape = CircleShape
+                        )
+                        .border(
+                            width = dimensionResource(id = R.dimen.two),
+                            shape = CircleShape,
+                            color = Color.Black
+                        )
+                        .size(dimensionResource(id = R.dimen.twentyTwo))
+                        .align(
+                            alignment = Alignment.TopCenter
+                        )
+                        .clickable {
+                            onCancelButtonClick.invoke()
+                            onDismiss()
+                        }
+                )
+
+            }
+        }
+    }
 }
 
 
