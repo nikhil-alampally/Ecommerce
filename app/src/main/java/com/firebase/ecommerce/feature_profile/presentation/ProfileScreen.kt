@@ -96,7 +96,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     loginModel: LoginViewModel = hiltViewModel(),
     profileData: HomeData,
-) {
+
+    ) {
     var isDialogVisible by remember { mutableStateOf(false) }
 
     var isUserNameEditing by remember { mutableStateOf(false) }
@@ -129,17 +130,6 @@ fun ProfileScreen(
         )
     val scope = rememberCoroutineScope()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xfff1e4e0))
-            .padding(
-                start = 4.dp,
-                top = 4.dp,
-                end = 4.dp,
-            )
-            .verticalScroll(rememberScrollState())
-    )
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetContent = {
@@ -173,335 +163,344 @@ fun ProfileScreen(
                 }
             }
         }
-    )
-    {
-        Box(
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    color = Color(0xff495d92),
-                ),
-        ) {
+                .background(color = Color(0xfff1e4e0))
+                .verticalScroll(rememberScrollState())
+        )
+        {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 180.dp)
-                    .clip(shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
-                    .background(color = Color(0xFAF8F8F8))
+                    .background(
+                        color = Color(0xff495d92),
+                    ),
             ) {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 25.dp, end = 25.dp, top = 80.dp)
+                        .padding(top = 180.dp)
+                        .clip(shape = RoundedCornerShape(topStart = 50.dp, topEnd = 50.dp))
+                        .background(color = Color(0xFAF8F8F8))
                 ) {
-                    if (isUserNameEditing) {
-                        viewModel.getHomeDataState.value?.userName?.let {
-                            TextField(
-                                value = viewModel.getHomeDataState.value!!.userName!!,
-                                onValueChange = { newValue ->
-                                    viewModel.updateUsername(newValue)
-                                },
-                                textStyle = TextStyle(
-                                    fontSize = 25.sp,
-                                    color = Color.Black
-                                ),
-                                colors = customTextFieldColors,
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally)
-                                    .height(60.dp)
-                            )
-                        }
-                    } else {
-                        viewModel.getHomeDataState.value?.userName?.let {
-                            viewModel.getHomeDataState.value!!.userName.let { it1 ->
-                                if (it1 != null) {
-                                    Text(
-                                        text = it1,
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 25.dp, end = 25.dp, top = 80.dp)
+                    ) {
+                        if (isUserNameEditing) {
+                            viewModel.getHomeDataState.value?.userName?.let {
+                                TextField(
+                                    value = viewModel.getHomeDataState.value!!.userName!!,
+                                    onValueChange = { newValue ->
+                                        viewModel.updateUsername(newValue)
+                                    },
+                                    textStyle = TextStyle(
                                         fontSize = 25.sp,
-                                        modifier = Modifier
-                                            .align(Alignment.CenterHorizontally)
-                                            .height(60.dp),
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.size(20.dp))
-
-                    PasswordUpdateDialog(
-                        context = context,
-                        showDialog = isDialogVisible,
-                        onDismiss = { isDialogVisible = false },
-                        onUpdatePassword = { newPassword, confirmPassword ->
-                            loginModel.updatePassword(newPassword, confirmPassword)
-                        }
-                    )
-
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.img_1),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            viewModel.getHomeDataState.value?.gender?.let {
-                                Text(
-                                    text = it,
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    color = Color.Black,
+                                        color = Color.Black
+                                    ),
+                                    colors = customTextFieldColors,
+                                    modifier = Modifier
+                                        .align(Alignment.CenterHorizontally)
+                                        .height(60.dp)
                                 )
                             }
-                        }
-
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_email_24),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            viewModel.getHomeDataState.value?.email?.let {
-                                Text(
-                                    text = it,
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    color = Color.Black,
-                                    modifier = Modifier.offset(0.dp, -2.dp)
-                                )
-                            }
-                        }
-
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_phone_24),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Spacer(modifier = Modifier.size(10.dp))
-                            if (isMobileNumberEditing) {
-                                viewModel.getHomeDataState.value?.mobileNumber?.let {
-                                    TextField(
-                                        value = viewModel.getHomeDataState.value!!.mobileNumber!!,
-                                        onValueChange = { newValue ->
-                                            viewModel.updateMobileNumber(newValue)
-                                        },
-                                        textStyle = TextStyle(
-                                            fontSize = 16.sp,
-                                            color = Color.Black
-                                        ),
-                                        colors = customTextFieldColors,
-                                        modifier = Modifier
-                                            .height(50.dp)
-                                    )
-                                }
-                            } else {
-                                viewModel.getHomeDataState.value?.mobileNumber?.let {
-                                    viewModel.getHomeDataState.value!!.mobileNumber?.let { it1 ->
+                        } else {
+                            viewModel.getHomeDataState.value?.userName?.let {
+                                viewModel.getHomeDataState.value!!.userName.let { it1 ->
+                                    if (it1 != null) {
                                         Text(
                                             text = it1,
-                                            textAlign = TextAlign.Start,
-                                            fontSize = 16.sp,
-                                            color = Color.Black,
+                                            fontSize = 25.sp,
+                                            modifier = Modifier
+                                                .align(Alignment.CenterHorizontally)
+                                                .height(60.dp),
+                                            fontWeight = FontWeight.Bold
                                         )
                                     }
                                 }
-
                             }
                         }
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_lock_24),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Spacer(modifier = Modifier.size(3.dp))
-                            TextButton(onClick = {
-                                isDialogVisible = true
+
+                        Spacer(modifier = Modifier.size(20.dp))
+
+                        PasswordUpdateDialog(
+                            context = context,
+                            showDialog = isDialogVisible,
+                            onDismiss = { isDialogVisible = false },
+                            onUpdatePassword = { newPassword, confirmPassword ->
+                                loginModel.updatePassword(newPassword, confirmPassword)
                             }
+                        )
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(
-                                    text = stringResource(R.string.update_password),
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    color = Color.Black,
+                                Icon(
+                                    painter = painterResource(id = R.drawable.img_1),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(start = 10.dp)
                                 )
+                                Spacer(modifier = Modifier.size(10.dp))
+                                viewModel.getHomeDataState.value?.gender?.let {
+                                    Text(
+                                        text = it,
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                    )
+                                }
                             }
-                        }
-                    }
-                    Spacer(modifier = Modifier.size(20.dp))
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
-                        shape = RoundedCornerShape(10.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_logout_24),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .padding(start = 10.dp)
-                            )
-                            Spacer(modifier = Modifier.size(3.dp))
-                            TextButton(onClick = {
-                                viewModel.deleteUserName()
-                                navController.navigate(NavRoute.LoginScreen.route)
-                            }) {
-                                Text(
-                                    text = stringResource(R.string.logout),
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    color = Color.Black,
-                                )
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.size(5.dp))
-                    Button(
-                        modifier = Modifier
-                            .padding(start = 130.dp, end = 60.dp)
-                            .clip(RoundedCornerShape(8.dp)),
-                        onClick = {
-                            isMobileNumberEditing = false
-                            isUserNameEditing = false
-                            //    isImageUpdating = false
 
-                            viewModel.saveProfileData()
-                        },
-                        enabled = isMobileNumberEditing || isImageUpdating,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ), shape = RoundedCornerShape(15.dp)
-                    ) {
-                        androidx.compose.material3.Text(stringResource(R.string.save))
+                        }
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_email_24),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(start = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.size(10.dp))
+                                viewModel.getHomeDataState.value?.email?.let {
+                                    Text(
+                                        text = it,
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                        modifier = Modifier.offset(0.dp, -2.dp)
+                                    )
+                                }
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_phone_24),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(start = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.size(10.dp))
+                                if (isMobileNumberEditing) {
+                                    viewModel.getHomeDataState.value?.mobileNumber?.let {
+                                        TextField(
+                                            value = viewModel.getHomeDataState.value!!.mobileNumber!!,
+                                            onValueChange = { newValue ->
+                                                viewModel.updateMobileNumber(newValue)
+                                            },
+                                            textStyle = TextStyle(
+                                                fontSize = 16.sp,
+                                                color = Color.Black
+                                            ),
+                                            colors = customTextFieldColors,
+                                            modifier = Modifier
+                                                .height(50.dp)
+                                        )
+                                    }
+                                } else {
+                                    viewModel.getHomeDataState.value?.mobileNumber?.let {
+                                        viewModel.getHomeDataState.value!!.mobileNumber?.let { it1 ->
+                                            Text(
+                                                text = it1,
+                                                textAlign = TextAlign.Start,
+                                                fontSize = 16.sp,
+                                                color = Color.Black,
+                                            )
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_lock_24),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(start = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.size(3.dp))
+                                TextButton(onClick = {
+                                    isDialogVisible = true
+                                }
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.update_password),
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xffffffff)),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_logout_24),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                        .padding(start = 10.dp)
+                                )
+                                Spacer(modifier = Modifier.size(3.dp))
+                                TextButton(onClick = {
+                                    viewModel.deleteUserName()
+                                    navController.navigate(NavRoute.LoginScreen.route)
+                                }) {
+                                    Text(
+                                        text = stringResource(R.string.logout),
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        color = Color.Black,
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.size(5.dp))
+                        Button(
+                            modifier = Modifier
+                                .padding(start = 130.dp, end = 60.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            onClick = {
+                                isMobileNumberEditing = false
+                                isUserNameEditing = false
+                                //    isImageUpdating = false
+
+                                viewModel.saveProfileData()
+                            },
+                            enabled = isMobileNumberEditing || isImageUpdating,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            ), shape = RoundedCornerShape(15.dp)
+                        ) {
+                            androidx.compose.material3.Text(stringResource(R.string.save))
+                        }
                     }
                 }
-            }
-            Box(
-                modifier = Modifier
-                    .padding(top = 180.dp)
-                    .height(120.dp)
-                    .width(120.dp)
-                    .align(Alignment.TopCenter)
-                    .offset(x = (7).dp, y = (-50).dp)
-                    .clip(RoundedCornerShape(30.dp)),
-            ) {
-                AsyncImage(
-                    model = viewModel.profileImage.value,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                )
-            }
-            Card(
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.Center)
-                    .offset(45.dp, -160.dp),
-                border = BorderStroke(1.dp, Color.White),
-                colors = CardDefaults.cardColors(containerColor = Color(0xff495d92)),
-                shape = CircleShape,
-            ) {
-                Icon(painter = painterResource(id = R.drawable.baseline_photo_camera_24),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .size(25.dp)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            scope.launch {
-                                isImageUpdating = true
-                                modalBottomSheetState.show()
-                            }
-                        })
-            }
-            Card(
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.CenterEnd)
-                    .offset(x = (-55).dp, y = (-210).dp),
-                elevation = CardDefaults.cardElevation(15.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_edit_24),
-                    contentDescription = null,
+                        .padding(top = 180.dp)
+                        .height(120.dp)
+                        .width(120.dp)
+                        .align(Alignment.TopCenter)
+                        .offset(x = (7).dp, y = (-50).dp)
+                        .clip(RoundedCornerShape(30.dp)),
+                ) {
+                    AsyncImage(
+                        model = viewModel.profileImage.value,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+                Card(
                     modifier = Modifier
                         .size(40.dp)
-                        .padding(5.dp)
-                        //.align(Alignment.Center)
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            isUserNameEditing = !isUserNameEditing
-                            isMobileNumberEditing = !isMobileNumberEditing
-                        }
-                )
+                        .align(Alignment.Center)
+                        .offset(45.dp, -160.dp),
+                    border = BorderStroke(1.dp, Color.White),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xff495d92)),
+                    shape = CircleShape,
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.baseline_photo_camera_24),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .size(25.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable {
+                                scope.launch {
+                                    isImageUpdating = true
+                                    modalBottomSheetState.show()
+                                }
+                            })
+                }
+                Card(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.CenterEnd)
+                        .offset(x = (-55).dp, y = (-210).dp),
+                    elevation = CardDefaults.cardElevation(15.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_edit_24),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp)
+                            .padding(5.dp)
+                            //.align(Alignment.Center)
+                            .align(Alignment.CenterHorizontally)
+                            .clickable {
+                                isUserNameEditing = !isUserNameEditing
+                                isMobileNumberEditing = !isMobileNumberEditing
+                            }
+                    )
+                }
             }
         }
     }
+
+
     LaunchedEffect(key1 = Unit) {
         viewModel.setHomeData(profileData)
     }
@@ -707,7 +706,11 @@ fun PasswordUpdateDialog(
                         onClick = {
                             if (passwordsMatch) {
                                 onUpdatePassword(newPassword.value, confirmPassword.value)
-                                Toast.makeText(context, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Password updated successfully",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 onDismiss()
                             }
                         },
