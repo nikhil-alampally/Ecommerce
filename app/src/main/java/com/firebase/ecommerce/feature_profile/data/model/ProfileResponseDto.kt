@@ -16,7 +16,6 @@ fun toProfileModel(profileModel: ProfileModel): ProfileModel {
         profileModel.mobileNumber,
         profileModel.gender,
         profileModel.userName,
-      //  profileModel.image,
     )
 }
 

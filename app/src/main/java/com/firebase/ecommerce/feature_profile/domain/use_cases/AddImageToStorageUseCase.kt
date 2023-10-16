@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AddImageToStorageUseCase @Inject constructor(private val profileRepository: ProfileRepository) {
-
     suspend operator fun invoke(uri: Uri) : Flow<Resource<Any>>{
        return profileRepository.addImageToFirebaseStorage(uri)
     }

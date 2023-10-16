@@ -57,14 +57,11 @@ class LoginViewModel @Inject constructor(
     fun updatePassword(newPassword: String, confirmPassword: String) = viewModelScope.launch {
         repository.updateUserPassword(newPassword, confirmPassword).collect { result ->
             when (result) {
-                is Resource.Success -> {
-                }
+                is Resource.Success -> Unit
 
-                is Resource.Loading -> {
-                }
+                is Resource.Loading -> Unit
 
-                is Resource.Error -> {
-                }
+                is Resource.Error -> Unit
             }
         }
     }

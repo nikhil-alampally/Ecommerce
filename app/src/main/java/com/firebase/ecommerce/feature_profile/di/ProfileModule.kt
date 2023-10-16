@@ -31,5 +31,4 @@ object ProfileModule {
         return SaveUserDetailsUseCase(profileRepository=profileRepository)
     }
 
-
 }

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetImageFromFirestoreUsecase @Inject constructor(private val profileRepository: ProfileRepository) {
-
     suspend operator fun invoke(): Flow<Resource<String>> {
         return profileRepository.getImageUrlFromFirestore()
     }

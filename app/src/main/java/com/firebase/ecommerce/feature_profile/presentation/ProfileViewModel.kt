@@ -14,16 +14,13 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.domain.HomeData
-import com.firebase.ecommerce.feature_profile.ProfileSignInState
 import com.firebase.ecommerce.feature_profile.domain.model.ProfileModel
 import com.firebase.ecommerce.feature_profile.domain.use_cases.AddImageToStorageUseCase
 import com.firebase.ecommerce.feature_profile.domain.use_cases.GetImageFromFirestoreUsecase
 import com.firebase.ecommerce.feature_profile.domain.use_cases.SaveUserDetailsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -42,9 +39,6 @@ class ProfileViewModel @Inject constructor(
 
     private val _profileImage: MutableState<Any?> = mutableStateOf(null)
     val profileImage: State<Any?> = _profileImage
-
-    private val _signInState = Channel<ProfileSignInState>()
-    val signInState = _signInState.receiveAsFlow()
 
     fun updateMobileNumber(number: String) {
         _getHomeDataState.value = _getHomeDataState.value?.copy(mobileNumber = number)
@@ -94,11 +88,9 @@ class ProfileViewModel @Inject constructor(
                         getImageUrlFromDatabase()
                     }
 
-                    is Resource.Error -> {
-                    }
+                    is Resource.Error -> Unit
 
-                    is Resource.Loading -> {
-                    }
+                    is Resource.Loading -> Unit
                 }
             }.launchIn(this)
         }
@@ -113,14 +105,9 @@ class ProfileViewModel @Inject constructor(
                         saveUserDetails(it.data!!)
                     }
 
-                    is Resource.Loading -> {
+                    is Resource.Loading -> Unit
 
-
-                    }
-
-                    is Resource.Error -> {
-
-                    }
+                    is Resource.Error -> Unit
                 }
             }.launchIn(this)
         }
@@ -145,9 +132,7 @@ class ProfileViewModel @Inject constructor(
                                 .show()
                         }
 
-                        is Resource.Loading -> {
-                            _signInState.send(ProfileSignInState(isLoading = true))
-                        }
+                        is Resource.Loading -> Unit
 
                         is Resource.Error -> {
                             Toast.makeText(application, result.message, Toast.LENGTH_SHORT).show()

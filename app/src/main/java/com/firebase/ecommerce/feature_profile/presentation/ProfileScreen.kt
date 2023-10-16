@@ -422,7 +422,6 @@ fun ProfileScreen(
                             onClick = {
                                 isMobileNumberEditing = false
                                 isUserNameEditing = false
-                                //    isImageUpdating = false
 
                                 viewModel.saveProfileData()
                             },
@@ -488,7 +487,6 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .padding(5.dp)
-                            //.align(Alignment.Center)
                             .align(Alignment.CenterHorizontally)
                             .clickable {
                                 isUserNameEditing = !isUserNameEditing
@@ -747,7 +745,6 @@ fun PasswordUpdateDialog(
                             onDismiss()
                         }
                 )
-
             }
         }
     }
