@@ -10,4 +10,9 @@ object Constants
     val WOMEN="3ef65d07-a793-419d-89a3-6f5117317cef"
     val ITEMSLIST="ItemsList"
     val Profile="Profile"
+    const val PROFILE = "Profile"
+    const val URL = "url"
+    const val UID = "profile_image"
+    const val PROFILE_IMAGE_NAME = "$UID.jpg"
+    const val ALL_IMAGES = "image/*"
 }

@@ -60,6 +60,7 @@ import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_home.data.Categories
 import com.firebase.ecommerce.feature_home.domain.HomeData
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
+import com.firebase.ecommerce.feature_profile.presentation.setData
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -151,6 +152,10 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                     .size(dimensionResource(id = R.dimen.fifty))
                     .clip(CircleShape)
                     .border(dimensionResource(id = R.dimen.four), Color.Gray, CircleShape)
+                    .border(4.dp, Color.Gray, CircleShape)
+                    .clickable {
+                        navController.setData("profile_details",profileData)
+                        navController.navigate(NavRoute.ProfileScreen.route) }
             )
             AssistChip(
                 onClick = {  },
@@ -251,6 +256,8 @@ fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->U
                         .fillMaxHeight()
                         .padding(dimensionResource(R.dimen.five))
                 )
+
+
                 Column(
                    modifier= Modifier
                        .fillMaxWidth()

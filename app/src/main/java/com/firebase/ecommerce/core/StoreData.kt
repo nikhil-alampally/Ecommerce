@@ -22,5 +22,4 @@ class StoreData @Inject constructor( private val dataStore: DataStore<Preference
             preferences[USERNAME]=name
         }
     }
-
 }

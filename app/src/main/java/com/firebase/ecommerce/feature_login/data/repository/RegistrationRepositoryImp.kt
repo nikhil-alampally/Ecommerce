@@ -2,8 +2,6 @@ package com.firebase.ecommerce.feature_login.data.repository
 
 
 
-import android.content.Context
-import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
 import com.firebase.ecommerce.feature_home.data.HomeDataDto
@@ -72,6 +70,26 @@ class RegistrationRepositoryImp @Inject constructor(
             emit(Resource.Error(message = it.message.toString()))
         }
     }
+
+    override fun updateUserPassword(newPassword: String,confirmPassword:String): Flow<Resource<AuthResult>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val user = firebaseAuth.currentUser
+
+                if (user != null) {
+                    user.updatePassword(newPassword).await()
+                    emit(Resource.Success(null))
+                } else {
+                    emit(Resource.Error(message = "User not authenticated"))
+                }
+            } catch (e: Exception) {
+                emit(Resource.Error(message = e.localizedMessage.orEmpty()))
+            }
+        }
+    }
+
+
 
     override fun signInWithGoogle(credential: AuthCredential): Flow<Resource<AuthResult>> {
         return flow {
