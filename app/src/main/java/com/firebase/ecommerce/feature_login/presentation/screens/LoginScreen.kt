@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,7 +62,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.connectivityState
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_home.data.model.HomeDataDto
 import com.firebase.ecommerce.feature_login.NoRippleInteractionSource
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -71,8 +70,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")

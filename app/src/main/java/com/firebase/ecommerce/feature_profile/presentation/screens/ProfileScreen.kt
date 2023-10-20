@@ -1,9 +1,6 @@
-package com.firebase.ecommerce.feature_profile.presentation
+package com.firebase.ecommerce.feature_profile.presentation.screens
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.net.Uri
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -58,13 +55,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -75,18 +70,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Constants
-import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.domain.HomeData
-import com.firebase.ecommerce.feature_login.presentation.screens.LoadingButton
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_login.presentation.viewmodels.LoginViewModel
-import com.firebase.ecommerce.feature_profile.domain.model.ProfileModel
+import com.firebase.ecommerce.feature_profile.presentation.viewmodel.ProfileViewModel
 import com.firebase.ecommerce.navigation.NavRoute
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
@@ -527,8 +517,8 @@ fun PasswordUpdateDialog(
     var showConfirmPassword by rememberSaveable {
         mutableStateOf(false)
     }
-    var newPassword = remember { mutableStateOf("") }
-    var confirmPassword = remember { mutableStateOf("") }
+    val newPassword = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") }
 
     var passwordsMatch by remember { mutableStateOf(true) }
 

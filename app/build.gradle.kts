@@ -106,5 +106,7 @@ dependencies {
     implementation ("com.google.firebase:firebase-core:21.1.1")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation ("com.airbnb.android:lottie-compose:4.0.0")
+    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 
 }

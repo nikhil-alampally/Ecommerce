@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_home.data.model.HomeDataDto
 import com.firebase.ecommerce.feature_login.domain.repository.RegistrationRepository
 import com.firebase.ecommerce.feature_login.domain.use_case.StoringGoogleSignInDataIntoFireStoreUseCase
 import com.firebase.ecommerce.feature_login.presentation.SignInState

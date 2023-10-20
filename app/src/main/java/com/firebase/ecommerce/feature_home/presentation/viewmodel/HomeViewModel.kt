@@ -1,13 +1,12 @@
-package com.firebase.ecommerce.feature_home.presentation
+package com.firebase.ecommerce.feature_home.presentation.viewmodel
 
 import android.annotation.SuppressLint
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.core.Resource
-import com.firebase.ecommerce.feature_home.HomeSignInState
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
-import com.firebase.ecommerce.feature_home.domain.GetDataHomeScreenUseCase
-import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_home.presentation.signInState.HomeSignInState
+import com.firebase.ecommerce.feature_home.domain.use_case.GetDataHomeScreenUseCase
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
