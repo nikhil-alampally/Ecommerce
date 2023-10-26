@@ -58,10 +58,10 @@ class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, pri
         return callbackFlow {
             trySend(Resource.Loading(true))
             try {
-                dataStore.getData.collect {
-                    if (it != null) {
+                dataStore.getData.collect { userId->
+                    if (userId != null) {
                         val docRef =
-                            it.let { it1 -> fireBase.firestore.collection( Constants.cartItemCollectionPath).document(it1) }
+                            userId.let { fireBase.firestore.collection( Constants.cartItemCollectionPath).document(it) }
                                 .collection(Constants.cartItemInternalCollectionPath).document(documentPath).delete()
                         docRef.addOnFailureListener {
                             trySend(Resource.Error(message = it.localizedMessage))
