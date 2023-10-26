@@ -89,7 +89,7 @@ fun NavGraph() {
             }
         }
         composable(NavRoute.WishlistScreen.route){
-            WishlistScreen()
+            WishlistScreen(navHostController = navController)
         }
 
     }

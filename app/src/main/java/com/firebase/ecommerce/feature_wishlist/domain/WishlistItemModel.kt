@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class WishlistItem(
+data class WishlistItemModel(
     val brand: String="",
     val category: String="",
     val description: String="",

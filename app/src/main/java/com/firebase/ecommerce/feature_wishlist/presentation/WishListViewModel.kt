@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.feature_home.DeleteSignInState
 import com.firebase.ecommerce.feature_wishlist.WishListSignInState
-import com.firebase.ecommerce.feature_wishlist.domain.WishlistItem
+import com.firebase.ecommerce.feature_wishlist.domain.WishlistItemModel
 import com.firebase.ecommerce.feature_wishlist.domain.usecases.DeleteWishlistItemUsecase
 import com.firebase.ecommerce.feature_wishlist.domain.usecases.GetDataForWishlistItemUsecase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +36,7 @@ class WishListViewModel @Inject constructor(
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _getDataInState.send(WishListSignInState(isSuccess = result.data as ArrayList<WishlistItem>))
+                            _getDataInState.send(WishListSignInState(isSuccess = result.data as ArrayList<WishlistItemModel>))
                             Log.e("wishlist", "${result.data}")
                         }
 

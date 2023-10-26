@@ -2,7 +2,7 @@ package com.firebase.ecommerce.feature_wishlist.data
 
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_wishlist.domain.WishlistItem
+import com.firebase.ecommerce.feature_wishlist.domain.WishlistItemModel
 import com.firebase.ecommerce.feature_wishlist.domain.WishlistRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -30,16 +30,16 @@ class WishlistRepositoryImpl @Inject constructor(
                             trySend(Resource.Error(message = it.localizedMessage))
 
                         }.addOnSuccessListener { querySnapshot ->
-                            val wishlistItemList = mutableListOf<WishlistItem>()
+                            val wishlistItemModelList = mutableListOf<WishlistItemModel>()
 
                             for (document in querySnapshot.documents) {
                                 val product =
-                                    document.toObject<WishlistItem>(WishlistItem::class.java)
+                                    document.toObject<WishlistItemModel>(WishlistItemModel::class.java)
                                 if (product != null) {
-                                    wishlistItemList.add(product)
+                                    wishlistItemModelList.add(product)
                                 }
                             }
-                            trySend(Resource.Success(data = wishlistItemList))
+                            trySend(Resource.Success(data = wishlistItemModelList))
                         }
                     }
 
