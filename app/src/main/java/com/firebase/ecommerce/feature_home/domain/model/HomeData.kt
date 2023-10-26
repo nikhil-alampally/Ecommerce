@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_home.domain
+package com.firebase.ecommerce.feature_home.domain.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize

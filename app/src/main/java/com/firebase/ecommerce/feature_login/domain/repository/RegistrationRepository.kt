@@ -1,8 +1,7 @@
 package com.firebase.ecommerce.feature_login.domain.repository
 
-import android.content.Context
 import com.firebase.ecommerce.core.Resource
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_home.data.model.HomeDataDto
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult

@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_home
+package com.firebase.ecommerce.feature_home.presentation.signInState
 
 import com.firebase.ecommerce.feature_products.domain.model.Product
 
