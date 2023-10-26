@@ -19,6 +19,7 @@ import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScr
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_profile.presentation.ProfileScreen
 import com.firebase.ecommerce.feature_profile.presentation.getData
+import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -86,6 +87,9 @@ fun NavGraph() {
             if (profileData != null) {
                 ProfileScreen(navController = navController, profileData = profileData, context = context )
             }
+        }
+        composable(NavRoute.WishlistScreen.route){
+            WishlistScreen()
         }
 
     }

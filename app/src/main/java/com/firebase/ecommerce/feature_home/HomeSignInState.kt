@@ -7,3 +7,10 @@ data class HomeSignInState(
     val isSuccess: HomeData?= null,
     val isError: String? = ""
 )
+
+data class DeleteSignInState(
+    val isLoading: Boolean = false,
+    val isSuccess: String?= null,
+    val isError: String? = ""
+)
+

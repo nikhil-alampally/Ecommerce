@@ -158,6 +158,26 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                         navController.navigate(NavRoute.ProfileScreen.route) }
             )
             AssistChip(
+                modifier = Modifier.padding(start = 50.dp),
+                onClick = {
+                    navController.navigate(NavRoute.WishlistScreen.route)
+                },
+                label = { Text("WishList") },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = Color.LightGray.copy(
+                        alpha = 0.3f
+                    )
+                ),
+                shape = RoundedCornerShape(dimensionResource(id = R.dimen.ten)),
+                leadingIcon = {
+                    Icon(
+                        painterResource(id = R.drawable.baseline_favorite_24),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.ten)),
+                        contentDescription = null
+                    )
+                },
+            )
+            AssistChip(
                 onClick = {  },
                 label = { Text(stringResource(id = R.string.orders)) },
                 colors = AssistChipDefaults.assistChipColors(
