@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_profile.presentation
+package com.firebase.ecommerce.feature_profile.presentation.viewmodel
 
 import android.app.Application
 import android.content.Context
@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_profile.domain.model.ProfileModel
 import com.firebase.ecommerce.feature_profile.domain.use_cases.AddImageToStorageUseCase
 import com.firebase.ecommerce.feature_profile.domain.use_cases.GetImageFromFirestoreUsecase
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val addImageToStorageUseCase: AddImageToStorageUseCase,
-    private val getImageFromFirestoreUsecase: GetImageFromFirestoreUsecase,
+    private val getImageFromFirestoreUseCase: GetImageFromFirestoreUsecase,
     private val saveUserDetailsUseCase: SaveUserDetailsUseCase,
     private val application: Application,
     private val dataStore: StoreData,
@@ -99,7 +99,7 @@ class ProfileViewModel @Inject constructor(
 
     fun getImageUrlFromDatabase() {
         viewModelScope.launch {
-            getImageFromFirestoreUsecase.invoke().onEach {
+            getImageFromFirestoreUseCase.invoke().onEach {
                 when (it) {
                     is Resource.Success -> {
                         saveUserDetails(it.data!!)

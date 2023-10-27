@@ -2,7 +2,6 @@ package com.firebase.ecommerce.feature_products.data.repository
 
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_products.data.ProductApiService
 import com.firebase.ecommerce.feature_products.data.model.toDomain
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.domain.repository.ProductsRepository
@@ -17,13 +16,17 @@ import java.io.IOException
 import java.lang.Exception
 import javax.inject.Inject
 
-class ProductRepositoryImp @Inject constructor(private val productApiService: ProductApiService, private val dataStore: StoreData, private val firebase: Firebase):
+class ProductRepositoryImp @Inject constructor(
+    private val productApiService: ProductApiService,
+    private val dataStore: StoreData,
+    val firebase: Firebase,
+) :
     ProductsRepository {
-    override suspend fun getProducts(id: String):Flow<Resource<List<Product>>> = flow {
+    override suspend fun getProducts(id: String): Flow<Resource<List<Product>>> = flow {
         emit(Resource.Loading())
         try {
             val response = productApiService.getProducts(id)
-            emit(Resource.Success(response.products.map{it.toDomain()}))
+            emit(Resource.Success(response.products.map { it.toDomain() }))
         } catch (e: IOException) {
             emit(Resource.Error(message = "Could not reach the server, please check your internet connection!"))
         } catch (e: HttpException) {
@@ -31,19 +34,22 @@ class ProductRepositoryImp @Inject constructor(private val productApiService: Pr
         }
     }
 
-    override suspend fun addToWishlist(product:Product): Flow<Resource<Any>> {
+    override suspend fun addToCart(product: Product): Flow<Resource<Any>> {
         return callbackFlow {
             trySend(Resource.Loading(true))
             try {
-                dataStore.getData.collect {value->
+                dataStore.getData.collect { value ->
                     if (value != null) {
                         val docRef =
-                            value.let { it1 -> firebase.firestore.collection("WishList").document(it1).collection(
-                                "wish_list_items"
-                            ) }
-                        docRef.document("${product.title}-${product.id}").set(product).addOnFailureListener {
-                            trySend(Resource.Error(message = it.localizedMessage))
-                        }.addOnSuccessListener {
+                            value.let { it1 ->
+                                firebase.firestore.collection("Cartitems").document(it1).collection(
+                                    "cart_items"
+                                )
+                            }
+                        docRef.document("${product.title}-${product.id}").set(product)
+                            .addOnFailureListener {
+                                trySend(Resource.Error(message = it.localizedMessage))
+                            }.addOnSuccessListener {
                             trySend(Resource.Success(data = value))
                         }
                     }
@@ -57,14 +63,47 @@ class ProductRepositoryImp @Inject constructor(private val productApiService: Pr
             }
         }
     }
-    override suspend fun deleteFromWishlist(documentPath:String): Flow<Resource<Any>> {
+
+    override suspend fun addToWishlist(product: Product): Flow<Resource<Any>> {
+        return callbackFlow {
+            trySend(Resource.Loading(true))
+            try {
+                dataStore.getData.collect { value ->
+                    if (value != null) {
+                        val docRef =
+                            value.let { it1 ->
+                                firebase.firestore.collection("WishList").document(it1).collection(
+                                    "wish_list_items"
+                                )
+                            }
+                        docRef.document("${product.title}-${product.id}").set(product)
+                            .addOnFailureListener {
+                                trySend(Resource.Error(message = it.localizedMessage))
+                            }.addOnSuccessListener {
+                            trySend(Resource.Success(data = value))
+                        }
+                    }
+
+                }
+            } catch (e: Exception) {
+                trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
+            }
+            awaitClose {
+                close()
+            }
+        }
+    }
+
+    override suspend fun deleteFromWishlist(documentPath: String): Flow<Resource<Any>> {
         return callbackFlow {
             trySend(Resource.Loading(true))
             try {
                 dataStore.getData.collect {
                     if (it != null) {
                         val docRef =
-                            it.let { it1 -> firebase.firestore.collection("WishList").document(it1) }
+                            it.let { it1 ->
+                                firebase.firestore.collection("WishList").document(it1)
+                            }
                                 .collection("wish_list_items").document(documentPath).delete()
                         docRef.addOnFailureListener {
                             trySend(Resource.Error(message = it.localizedMessage))

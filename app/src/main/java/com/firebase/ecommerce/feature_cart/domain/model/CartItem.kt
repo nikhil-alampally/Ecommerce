@@ -1,10 +1,10 @@
-package com.firebase.ecommerce.feature_products.domain.model
+package com.firebase.ecommerce.feature_cart.domain.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class Product(
+data class CartItem (
     val brand: String="",
     val category: String="",
     val description: String="",
@@ -15,5 +15,6 @@ data class Product(
     val rating: Double=0.00,
     val stock: Int=0,
     val thumbnail: String="",
-    val title: String=""
-):Parcelable
+    val title: String="",
+    var quantity:Int=1,
+): Parcelable

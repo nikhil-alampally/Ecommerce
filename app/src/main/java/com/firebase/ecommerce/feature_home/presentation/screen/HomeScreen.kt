@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_home.presentation
+package com.firebase.ecommerce.feature_home.presentation.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -31,6 +31,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,53 +60,62 @@ import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.core.connectivityState
-import com.firebase.ecommerce.feature_home.data.Categories
-import com.firebase.ecommerce.feature_home.domain.HomeData
+import com.firebase.ecommerce.feature_cart.presentation.screens.CartScreen
+import com.firebase.ecommerce.feature_home.data.model.Categories
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
+import com.firebase.ecommerce.feature_home.presentation.viewmodel.HomeViewModel
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
-import com.firebase.ecommerce.feature_profile.presentation.setData
+import com.firebase.ecommerce.feature_profile.presentation.screens.setData
+import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun HomeScreenPreview(navController: NavHostController) {
-    CardsItems(
+fun HomeScreen(navController: NavHostController) {
+    HomeScreenContent(
         categories = listOf(
             Categories(
                 title = stringResource(id = R.string.getTheBestElectronics),
-               image =  painterResource(id = R.drawable.electronic_image),
-                color = Color.Yellow.copy(alpha = 0.3f),Constants.ELECTRONICS
+                image = painterResource(id = R.drawable.electronic_image),
+                color = Color.Yellow.copy(alpha = 0.3f), Constants.ELECTRONICS
             ),
             Categories(
-                title=stringResource(id = R.string.getTheBestMenShopping),
+                title = stringResource(id = R.string.getTheBestMenShopping),
                 image = painterResource(id = R.drawable.men_transformed),
-                color = Color(0xff85C1E9 ).copy(alpha = 0.2f),Constants.MEN
+                color = Color(0xff85C1E9).copy(alpha = 0.2f), Constants.MEN
             ),
             Categories(
-                title= stringResource(id = R.string.getTheBestWomenShopping),
-               image =  painterResource(id = R.drawable.women),
-                color = Color(0xffF1948A).copy(alpha = 0.2f),Constants.WOMEN
+                title = stringResource(id = R.string.getTheBestWomenShopping),
+                image = painterResource(id = R.drawable.women),
+                color = Color(0xffF1948A).copy(alpha = 0.2f), Constants.WOMEN
             ),
             Categories(
-                title =stringResource(id = R.string.getTheBestSkinCare) ,
-               image =  painterResource(id = R.drawable.skincare),
-                color = Color(0xff82E0AA).copy(alpha = 0.3f),Constants.SKINCARE
+                title = stringResource(id = R.string.getTheBestSkinCare),
+                image = painterResource(id = R.drawable.skincare),
+                color = Color(0xff82E0AA).copy(alpha = 0.3f), Constants.SKINCARE
             ),
             Categories(
                 title = stringResource(id = R.string.homeAndDecor),
                 image = painterResource(id = R.drawable.home),
-                color = Color(0xffAEB6BF).copy(alpha = 0.2f),Constants.HOMEDECORE
+                color = Color(0xffAEB6BF).copy(alpha = 0.2f), Constants.HOMEDECORE
             )
-        ),navController
+        ), navController
     )
+
 }
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardsItems(categories: List<Categories>, navController: NavHostController, homeViewModel: HomeViewModel= hiltViewModel()) {
-    val scope= rememberCoroutineScope()
+fun HomeScreenContent(
+    categories: List<Categories>,
+    navController: NavHostController,
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
+    val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
     var profileData: HomeData? by remember {
         mutableStateOf(null)
@@ -113,30 +125,35 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
     }
     LaunchedEffect(Unit) {
         delay(1000)
-        visible=true
+        visible = true
 
     }
     LaunchedEffect(key1 = Unit, block = {
         scope.launch {
             homeViewModel.getData()
-            homeViewModel.getDataInState.collect{
-                profileData=it.isSuccess
+            homeViewModel.getDataInState.collect {
+                profileData = it.isSuccess
             }
 
         }
     })
 
     val connection by connectivityState()
-    if(connection== ConnectionState.Unavailable) {
+    if (connection == ConnectionState.Unavailable) {
         var showDialog by remember {
             mutableStateOf(true)
         }
         CustomDialogBox(
             message = stringResource(id = R.string.NoInternet),
-            onCancelButtonClick = {showDialog=false},
-            showDialog = showDialog)
+            onCancelButtonClick = { showDialog = false },
+            showDialog = showDialog
+        )
     }
-    Column(modifier=Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp)
+    ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
@@ -145,7 +162,7 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                 .padding(dimensionResource(id = R.dimen.ten))
         ) {
             AsyncImage(
-                model=profileData?.image,
+                model = profileData?.image,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -154,31 +171,12 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                     .border(dimensionResource(id = R.dimen.four), Color.Gray, CircleShape)
                     .border(4.dp, Color.Gray, CircleShape)
                     .clickable {
-                        navController.setData("profile_details",profileData)
-                        navController.navigate(NavRoute.ProfileScreen.route) }
+                        navController.setData("profile_details", profileData)
+                        navController.navigate(NavRoute.ProfileScreen.route)
+                    }
             )
             AssistChip(
-                modifier = Modifier.padding(start = 50.dp),
-                onClick = {
-                    navController.navigate(NavRoute.WishlistScreen.route)
-                },
-                label = { Text("WishList") },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = Color.LightGray.copy(
-                        alpha = 0.3f
-                    )
-                ),
-                shape = RoundedCornerShape(dimensionResource(id = R.dimen.ten)),
-                leadingIcon = {
-                    Icon(
-                        painterResource(id = R.drawable.baseline_favorite_24),
-                        modifier = Modifier.padding(dimensionResource(R.dimen.ten)),
-                        contentDescription = null
-                    )
-                },
-            )
-            AssistChip(
-                onClick = {  },
+                onClick = { },
                 label = { Text(stringResource(id = R.string.orders)) },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = Color.LightGray.copy(
@@ -198,7 +196,7 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.twenty)))
 
         Text(
-            text="WELCOME ${profileData?.userName}",
+            text = if(profileData?.userName!=null){"WELCOME ${profileData?.userName}"} else "",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = dimensionResource(R.dimen.thirty)),
@@ -220,12 +218,12 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
                 state = scrollState
             ) {
                 items(categories) {
-                    SingleItem(
+                    CategorySingleItem(
                         title = it.title,
                         image = it.image,
                         cardColor = it.color,
                         onItemClick = {
-                            navController.setData(Constants.apiParameterKey,it.category)
+                            navController.setData(Constants.apiParameterKey, it.category)
                             navController.navigate(NavRoute.ItemScreen.route)
                         },
                     )
@@ -239,72 +237,124 @@ fun CardsItems(categories: List<Categories>, navController: NavHostController, h
 
 
 @Composable
-fun SingleItem(title: String, image: Painter, cardColor: Color,onItemClick:()->Unit={}) {
+fun CategorySingleItem(title: String, image: Painter, cardColor: Color, onItemClick: () -> Unit = {}) {
 
-        Card(
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .height(dimensionResource(R.dimen.oneFifty))
+            .background(color = Color.Transparent)
+            .padding(
+                horizontal = dimensionResource(R.dimen.twenty),
+                vertical = dimensionResource(R.dimen.ten)
+            ),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.twentyFive)),
+        border = BorderStroke(2.dp, cardColor),
+        elevation = CardDefaults.outlinedCardElevation(8.dp),
+
+
+        ) {
+
+        Row(
             modifier = Modifier
-                .wrapContentSize()
-                .height(dimensionResource(R.dimen.oneFifty))
-                .background(color = Color.Transparent)
-                .padding(
-                    horizontal = dimensionResource(R.dimen.twenty),
-                    vertical = dimensionResource(R.dimen.ten)
-                ),
-            shape = RoundedCornerShape(dimensionResource(R.dimen.twentyFive)),
-            border = BorderStroke(2.dp, cardColor),
-            elevation = CardDefaults.outlinedCardElevation(8.dp),
+                .fillMaxWidth()
+                .background(color = cardColor)
+                .clickable {
+                    onItemClick.invoke()
+                }
 
+        ) {
 
-            ) {
-
-            Row(
+            Image(
+                painter = image,
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(color = cardColor)
-                    .clickable {
-                        onItemClick.invoke()
-                    }
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .padding(dimensionResource(R.dimen.five))
+            )
 
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(2f)
+                    .fillMaxHeight()
+                    .padding(start = dimensionResource(R.dimen.ten)),
+                verticalArrangement = Arrangement.Center
             ) {
-
-                Image(
-                    painter = image,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(dimensionResource(R.dimen.five))
+                Text(
+                    text = title,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.ten))
                 )
-
-
-                Column(
-                   modifier= Modifier
-                       .fillMaxWidth()
-                       .weight(2f)
-                       .fillMaxHeight()
-                       .padding(start = dimensionResource(R.dimen.ten)),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = title,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.ten))
-                    )
-                    Text(
-                        text= stringResource(id = R.string.show_now),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clickable {})
-                }
+                Text(
+                    text = stringResource(id = R.string.show_now),
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .clickable {})
             }
         }
+    }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Composable
+fun BottomNavigation(navController: NavHostController) {
+    val screens = listOf(Constants.homeScreen, Constants.cartScreen, Constants.wishlistScreen)
+    var selectedScreen by remember { mutableStateOf(screens.first()) }
 
-fun <T>NavHostController.setData(key: String, value: T){
+    Scaffold(
+        bottomBar = {
+            NavigationBar() {
+                screens.forEach { screen ->
+                    NavigationBarItem(
+                        icon = {
+                            Icon(
+                                getIconForScreen(screen),
+                                contentDescription = screen,
+                                modifier = Modifier.padding(bottom = dimensionResource(id = R.dimen.ten))
+                            )
+                        },
+                        label = { Text(screen) },
+                        selected = screen == selectedScreen,
+                        onClick = { selectedScreen = screen },
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+        },
+        content = {
+
+            if (selectedScreen == Constants.homeScreen) {
+                HomeScreen(navController = navController)
+            }
+            if (selectedScreen == Constants.cartScreen) {
+                CartScreen()
+            }
+            if (selectedScreen == Constants.wishlistScreen) {
+                WishlistScreen(navHostController = navController)
+            }
+
+        }
+    )
+}
+
+@Composable
+fun getIconForScreen(screen: String): Painter {
+    return when (screen) {
+        Constants.homeScreen -> painterResource(id = R.drawable.baseline_home_24)
+        Constants.cartScreen -> painterResource(id = R.drawable.baseline_shopping_cart_24)
+        Constants.wishlistScreen -> painterResource(id = R.drawable.baseline_favorite_24)
+        else -> painterResource(id = R.drawable.baseline_home_24)
+    }
+}
+
+fun <T> NavHostController.setData(key: String, value: T) {
     currentBackStackEntry?.savedStateHandle?.set(key, value)
 }
 

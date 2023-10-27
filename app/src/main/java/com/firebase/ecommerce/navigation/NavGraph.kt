@@ -10,22 +10,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.feature_home.presentation.screen.BottomNavigation
 import com.firebase.ecommerce.feature_products.presentation.screens.DetailScreen
-import com.firebase.ecommerce.feature_products.presentation.screens.ItemScreen
-import com.firebase.ecommerce.feature_home.domain.HomeData
-import com.firebase.ecommerce.feature_home.presentation.HomeScreenPreview
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
 import com.firebase.ecommerce.feature_products.domain.model.Product
-import com.firebase.ecommerce.feature_profile.presentation.ProfileScreen
-import com.firebase.ecommerce.feature_profile.presentation.getData
+import com.firebase.ecommerce.feature_products.presentation.screens.ProductScreen
+import com.firebase.ecommerce.feature_profile.presentation.screens.ProfileScreen
+import com.firebase.ecommerce.feature_profile.presentation.screens.getData
 import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 
 val tweenSpec =
-    tween<IntOffset>(durationMillis = 1000, easing = CubicBezierEasing(0.08f, 0.93f, 0.68f, 1.27f))
+    tween<IntOffset>(durationMillis = 500, easing = CubicBezierEasing(0.08f, 0.93f, 0.68f, 1.27f))
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -44,12 +44,15 @@ fun NavGraph() {
             LoginScreen(navigate = {
                 navController.navigate(NavRoute.RegisterScreen.route)
             }, navigateToHomeScreen = {
+
                 navController.navigate(NavRoute.HomeScreen.route)
             })
         }
-        composable(NavRoute.HomeScreen.route) {
-            HomeScreenPreview(navController)
+        composable(NavRoute.HomeScreen.route){
+            BottomNavigation(navController = navController)
+
         }
+
         composable(NavRoute.ItemScreen.route, enterTransition = {
             initialState
             slideInVertically(initialOffsetY = { 1000 }, animationSpec = tweenSpec)
@@ -68,9 +71,9 @@ fun NavGraph() {
             }) {
             navController.getData<String>(Constants.apiParameterKey).let{
                 if(it!=null){
-                    ItemScreen(category = it, navController =navController, onItemClick = {
-                        navController.navigate(NavRoute.DetailsScreen.route)
-                    })
+                   ProductScreen(category = it, navController = navController, onItemClick = {
+                       navController.navigate(NavRoute.DetailsScreen.route)
+                   })
                 }
             }
         }
@@ -91,6 +94,7 @@ fun NavGraph() {
         composable(NavRoute.WishlistScreen.route){
             WishlistScreen(navHostController = navController)
         }
+
 
     }
 }

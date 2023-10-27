@@ -1,9 +1,9 @@
 package com.firebase.ecommerce.feature_home.di
 
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.data.HomeRepositoryImp
-import com.firebase.ecommerce.feature_home.domain.GetDataHomeScreenUseCase
-import com.firebase.ecommerce.feature_home.domain.HomeRepository
+import com.firebase.ecommerce.feature_home.data.repository.HomeRepositoryImp
+import com.firebase.ecommerce.feature_home.domain.use_case.GetDataHomeScreenUseCase
+import com.firebase.ecommerce.feature_home.domain.repository.HomeRepository
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides

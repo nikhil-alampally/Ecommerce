@@ -6,15 +6,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Resource
-import com.firebase.ecommerce.feature_home.DeleteSignInState
-import com.firebase.ecommerce.feature_home.ProductsState
-import com.firebase.ecommerce.feature_login.presentation.SignInState
+import com.firebase.ecommerce.feature_cart.domain.model.CartItem
+import com.firebase.ecommerce.feature_cart.presentation.signInState.CartSignInState
+import com.firebase.ecommerce.feature_home.presentation.signInState.ProductsState
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.domain.use_case.AddToWishListUseCase
 import com.firebase.ecommerce.feature_products.domain.use_case.DeleteFromWishlistUseCase
 import com.firebase.ecommerce.feature_products.domain.use_case.GetProductDataUseCase
+import com.firebase.ecommerce.feature_products.domain.use_case.StoringCartItemsIntoFireStoreUseCase
+import com.firebase.ecommerce.feature_wishlist.DeleteSignInState
+import com.firebase.ecommerce.feature_wishlist.WishListSignInState
+import com.firebase.ecommerce.feature_wishlist.domain.WishlistItemModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collectLatest
@@ -25,18 +28,20 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductViewModel @Inject constructor(
     private val getProductDataUseCase: GetProductDataUseCase,
+    private val storingCartItemsIntoFireStoreUseCase: StoringCartItemsIntoFireStoreUseCase,
     private val addToWishListUseCase: AddToWishListUseCase,
     private val deleteFromWishlistUseCase: DeleteFromWishlistUseCase,
-) :
-    ViewModel() {
+) : ViewModel() {
 
 
     private val _getData = Channel<ProductsState>()
     val getData = _getData.receiveAsFlow()
     private val _selectedCategory = mutableStateOf("All")
     val selectedCategory: State<String> = _selectedCategory
+    private val _addToCartDataState = Channel<CartSignInState>()
+    val addToCartDataState = _addToCartDataState.receiveAsFlow()
 
-    private val _addToWishListDataState = Channel<SignInState>()
+    private val _addToWishListDataState = Channel<WishListSignInState>()
     val addToWishListDataState = _addToWishListDataState.receiveAsFlow()
 
     private val _deleteItemInState = Channel<DeleteSignInState>()
@@ -82,24 +87,48 @@ class ProductViewModel @Inject constructor(
         }
     }
 
-    fun addToWishlistData(product: Product, context: Context) {
+    fun storeAddToCartData(product: Product, context: Context) {
+        viewModelScope.launch {
+            storingCartItemsIntoFireStoreUseCase.storingCartItemsIntoFireStore(product)
+                .collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            Log.e("success in getting data", "ssucess")
+                            _addToCartDataState.send(CartSignInState(isSuccess = result.data as ArrayList<CartItem>))
+                        }
+
+                        is Resource.Loading -> {
+                            Log.e("loading in getting data", "ssucess")
+                            _addToCartDataState.send(CartSignInState(isLoading = true))
+                        }
+
+                        is Resource.Error -> {
+                            Log.e("error in getting data", result.message.toString())
+                            _addToCartDataState.send(CartSignInState(isError = result.message))
+                        }
+                    }
+                }
+        }
+    }
+
+    fun addToWishlistData(product: Product) {
         viewModelScope.launch {
             addToWishListUseCase.addToWIshList(product)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
                             Log.e("success in getting data", "success")
-                            _addToWishListDataState.send(SignInState(isSuccess = context.getString(R.string.successfullyLoggedIn)))
+                            _addToWishListDataState.send(WishListSignInState(isSuccess = result.data as ArrayList<WishlistItemModel>))
                         }
 
                         is Resource.Loading -> {
                             Log.e("loading in getting data", "success")
-                            _addToWishListDataState.send(SignInState(isLoading = true))
+                            _addToWishListDataState.send(WishListSignInState(isLoading = true))
                         }
 
                         is Resource.Error -> {
                             Log.e("error in getting data", result.message.toString())
-                            _addToWishListDataState.send(SignInState(isError = result.message))
+                            _addToWishListDataState.send(WishListSignInState(isError = result.message))
                         }
                     }
                 }

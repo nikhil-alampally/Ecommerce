@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_products.data
+package com.firebase.ecommerce.feature_products.data.repository
 
 import com.firebase.ecommerce.feature_products.data.model.ProductsListDto
 import retrofit2.http.GET

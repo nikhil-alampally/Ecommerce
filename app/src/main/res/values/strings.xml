@@ -54,4 +54,7 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="update">Update</string>
     <string name="new_password">New Password</string>
+    <string name="PlaceOrder">Place Order</string>
+    <string name="DeletedSuccessfully">Deleted successfully</string>
+    <string name="goToCart">go to cart</string>
 </resources>

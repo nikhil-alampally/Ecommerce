@@ -1,13 +1,14 @@
 package com.firebase.ecommerce.feature_products.di
 
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_products.data.ProductApiService
+import com.firebase.ecommerce.feature_products.data.repository.ProductApiService
 import com.firebase.ecommerce.feature_products.data.repository.ProductRepositoryImp
 import com.firebase.ecommerce.feature_products.domain.use_case.GetProductDataUseCase
 import com.firebase.ecommerce.feature_products.domain.repository.ProductsRepository
+import com.firebase.ecommerce.feature_products.domain.use_case.StoringCartItemsIntoFireStoreUseCase
+import com.google.firebase.ktx.Firebase
 import com.firebase.ecommerce.feature_products.domain.use_case.AddToWishListUseCase
 import com.firebase.ecommerce.feature_products.domain.use_case.DeleteFromWishlistUseCase
-import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,22 +31,26 @@ object ProductDi {
             .build()
             .create(ProductApiService::class.java)
     }
-
     @Provides
     @Singleton
     fun provideProductsRepository(
-        productsApiService: ProductApiService, dataStore: StoreData, firebase: Firebase,
+        productsApiService: ProductApiService, fireBase:Firebase, dataStore:StoreData
     ): ProductsRepository {
         return ProductRepositoryImp(
-            productsApiService,dataStore,firebase
+            productsApiService,dataStore,fireBase
         )
     }
 
+    @Provides
+    @Singleton
+    fun addTOCartUseCase(productsRepository: ProductsRepository):StoringCartItemsIntoFireStoreUseCase{
+        return StoringCartItemsIntoFireStoreUseCase(productsRepository)
+    }
 
     @Provides
     @Singleton
     fun getDataUseCase(
-        productsRepository: ProductsRepository,
+        productsRepository: ProductsRepository
     ): GetProductDataUseCase {
         return GetProductDataUseCase(productsRepository)
     }

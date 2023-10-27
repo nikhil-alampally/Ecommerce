@@ -1,6 +1,7 @@
 package com.firebase.ecommerce.feature_products.presentation.screens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -55,94 +56,142 @@ import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.core.connectivityState
-import com.firebase.ecommerce.feature_home.presentation.setData
+import com.firebase.ecommerce.feature_cart.domain.model.CartItem
+import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
+
+import com.firebase.ecommerce.feature_home.presentation.screen.setData
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.viewmodel.ProductViewModel
 import kotlinx.coroutines.launch
 
 
-@SuppressLint("MutableCollectionMutableState")
+
+
+
+@SuppressLint("MutableCollectionMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ItemScreen(
+fun ProductScreen(
     viewModel: ProductViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = hiltViewModel(),
     category: String,
     navController: NavHostController,
     onItemClick: () -> Unit = {}
 ) {
-    val connection by connectivityState()
-    if (connection == ConnectionState.Unavailable) {
-        var showDialog by remember {
-            mutableStateOf(true)
+
+        val connection by connectivityState()
+        if (connection == ConnectionState.Unavailable) {
+            var showDialog by remember {
+                mutableStateOf(true)
+            }
+            CustomDialogBox(
+                message = stringResource(id = R.string.NoInternet),
+                onCancelButtonClick = { showDialog = false },
+                showDialog = showDialog
+            )
         }
-        CustomDialogBox(
-            message = stringResource(id = R.string.NoInternet),
-            onCancelButtonClick = { showDialog = false },
-            showDialog = showDialog
-        )
+    var cartItemsList by remember {
+        mutableStateOf<ArrayList<CartItem>?>(null)
     }
 
-    val items = viewModel.getData.collectAsState(initial = null)
-    val scope = rememberCoroutineScope()
-    var itemsList by remember {
-        mutableStateOf<List<Product>?>(null)
-    }
-    var chipsListCategory by remember {
-        mutableStateOf<List<String>?>(null)
-    }
-    LaunchedEffect(key1 = Unit, key2 = viewModel.selectedCategory.value, block = {
-        viewModel.getProducts(category)
-    })
+            val items = viewModel.getData.collectAsState(initial = null)
 
-    LaunchedEffect(key1 = items.value?.products, block = {
-        scope.launch {
 
-            if (items.value?.products?.isNotEmpty() == true) {
-                itemsList = items.value!!.products
-                val categoryList = itemsList?.map { it.category }?.distinct()
-                if (viewModel.selectedCategory.value == "All") {
-                    chipsListCategory = categoryList
+            val scope = rememberCoroutineScope()
+            var itemsList by remember {
+                mutableStateOf<List<Product>?>(null)
+            }
+            var chipsListCategory by remember {
+                mutableStateOf<List<String>?>(null)
+            }
+            LaunchedEffect(key1 = Unit, key2 = viewModel.selectedCategory.value, block = {
+                viewModel.getProducts(category)
+                cartViewModel.getData()
+
+            })
+
+            LaunchedEffect(key1 = items.value?.products, block = {
+                scope.launch {
+
+                    if (items.value?.products?.isNotEmpty() == true) {
+                        itemsList = items.value!!.products
+                        val categoryList= itemsList?.map { it.category }?.distinct()
+                        val newList = mutableListOf("All")
+                        if (categoryList != null) {
+                            newList.addAll(categoryList)
+                        }
+                        if (viewModel.selectedCategory.value == "All") {
+                            chipsListCategory = newList
+                        }
+
+                    }
                 }
+            })
 
-            }
-        }
-    })
-
-    Column {
-        Row {
-            chipsListCategory?.let { stringList ->
-                Categories(
-                    categories = stringList,
-                    onSelectCategory = {
-                        viewModel.setCategory(it)
-                    },
-                    selectedCategory = viewModel.selectedCategory.value,
-                    navController = navController
-                )
-            }
-        }
-        LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
-            itemsList?.size?.let {
-                println(itemsList!!.size.toString())
-                items(itemsList!!) {
-                    SingleItems(item = it, onItemClick = {
-                        navController.setData(Constants.ITEMSLIST, it)
-                        onItemClick()
-                    })
+            Column {
+                Row {
+                    chipsListCategory?.let { stringList ->
+                        Categories(
+                            categories = stringList,
+                            onSelectCategory = {
+                                viewModel.setCategory(it)
+                            },
+                            selectedCategory = viewModel.selectedCategory.value,
+                            navController = navController
+                        )
+                    }
                 }
+                LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
+
+                    scope.launch {
+                        cartViewModel.getDataInState.collect{
+                            cartItemsList=it.isSuccess
+                        }
+                    }
+
+                        val cartItemIds = cartItemsList?.map { it.title }
+
+
+                    Log.e("cartItemId's",cartItemIds.toString())
+
+
+                    itemsList?.size?.let {
+                        println(itemsList!!.size.toString())
+                        items(itemsList!!) {
+                           val goToCart= cartItemIds?.contains(it.title)
+
+                            SingleItems(item = it, onItemClick = {
+                                navController.setData(Constants.ITEMSLIST, it)
+                                onItemClick()
+                            }, viewModel,goToCart,navController)
+                        }
+                    }
+                })
             }
-        })
-    }
+
 
 }
 
 
+
+
 @Composable
-fun SingleItems(item: Product, onItemClick: () -> Unit = {}, viewModel: ProductViewModel= hiltViewModel()) {
+fun SingleItems(
+    item: Product,
+    onItemClick: () -> Unit = {},
+    viewModel: ProductViewModel = hiltViewModel(),
+    goToCart: Boolean?,
+    navController: NavHostController,
+cartViewModel: CartViewModel = hiltViewModel()
+) {
     var colorChange by remember {
         mutableStateOf(false)
     }
+    var count by remember {
+        mutableStateOf(0)
+    }
 
+    val scope= rememberCoroutineScope()
     val context= LocalContext.current
 
     Card(
@@ -179,7 +228,7 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}, viewModel: ProductV
                         .clickable {
                             colorChange = !colorChange
                             if (colorChange) {
-                                viewModel.addToWishlistData(item, context = context)
+                                viewModel.addToWishlistData(item)
                             }
                             else{
                                 viewModel.deleteWishlistItem("${item.title}-${item.id}")
@@ -213,7 +262,7 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}, viewModel: ProductV
                 Text(
                     text = item.title,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.five)),
+                    modifier = Modifier,
                     maxLines = 1
                 )
                 Row {
@@ -235,7 +284,13 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}, viewModel: ProductV
 
                 RatingBarHalfStar(currentRating = item.rating.toFloat(), onRatingChanged = {})
                 Button(
-                    onClick = {},
+                    onClick = {
+                       count++
+                        if(goToCart==true){
+                        navController.popBackStack()
+                        }
+                        viewModel.storeAddToCartData(product=item, context = context)
+                    },
                     modifier = Modifier
                         .wrapContentSize()
                         .fillMaxWidth()
@@ -245,7 +300,12 @@ fun SingleItems(item: Product, onItemClick: () -> Unit = {}, viewModel: ProductV
                             bottom = dimensionResource(id = R.dimen.two)
                         ),
                 ) {
-                    Text(stringResource(id = R.string.addToCart))
+                    if(goToCart==true||count==1){
+                        Text(stringResource(id = R.string.goToCart))
+                    }
+                    else {
+                        Text(stringResource(id = R.string.addToCart))
+                    }
 
                 }
             }
@@ -259,11 +319,10 @@ fun Categories(
     categories: List<String>,
     onSelectCategory: (String) -> Unit,
     selectedCategory: String,
-    viewModel: ProductViewModel = hiltViewModel(),
     navController: NavHostController
 
 ) {
-    val context = LocalContext.current
+
 
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
@@ -273,35 +332,15 @@ fun Categories(
                 .padding(start = dimensionResource(id = R.dimen.ten))
                 .clickable {
                     navController.popBackStack()
+
                 })
-        AssistChip(
-            onClick = {
-                viewModel.setCategory(context.getString(R.string.all))
-            },
-            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.ten)),
-            label = { Text(stringResource(id = R.string.all)) },
-            colors = if (viewModel.selectedCategory.value == stringResource(id = R.string.all)) {
-                AssistChipDefaults.assistChipColors(
-                    containerColor = Color.Yellow.copy(
-                        alpha = 0.3f
-                    )
-                )
-            } else {
-                AssistChipDefaults.assistChipColors(
-                    containerColor = Color.LightGray.copy(
-                        alpha = 0.3f
-                    )
-                )
-
-            },
-            shape = RoundedCornerShape(dimensionResource(id = R.dimen.ten)),
-
-            )
         LazyRow(
             Modifier,
             horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.eight)),
         ) {
+
             items(categories) { category ->
+
                 AssistChip(
                     onClick = {
                         onSelectCategory(category)

@@ -1,10 +1,9 @@
-package com.firebase.ecommerce.feature_home.data
+package com.firebase.ecommerce.feature_home.data.repository
 
-import android.util.Log
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.domain.HomeData
-import com.firebase.ecommerce.feature_home.domain.HomeRepository
+import com.firebase.ecommerce.feature_home.domain.model.HomeData
+import com.firebase.ecommerce.feature_home.domain.repository.HomeRepository
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.channels.awaitClose

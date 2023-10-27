@@ -1,7 +1,6 @@
-package com.firebase.ecommerce.feature_home.domain
+package com.firebase.ecommerce.feature_home.domain.repository
 
 import com.firebase.ecommerce.core.Resource
-import com.firebase.ecommerce.feature_home.data.Categories
 import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {

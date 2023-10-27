@@ -4,7 +4,7 @@ package com.firebase.ecommerce.feature_login.data.repository
 
 import com.firebase.ecommerce.core.Resource
 import com.firebase.ecommerce.core.StoreData
-import com.firebase.ecommerce.feature_home.data.HomeDataDto
+import com.firebase.ecommerce.feature_home.data.model.HomeDataDto
 import com.firebase.ecommerce.feature_login.data.model.toDomain
 import com.firebase.ecommerce.feature_login.domain.model.RegistrationDetails
 import com.firebase.ecommerce.feature_login.domain.repository.RegistrationRepository

@@ -1,15 +1,15 @@
-package com.firebase.ecommerce.feature_wishlist.presentation
+package com.firebase.ecommerce.feature_cart.presentation.viewmodel
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.firebase.ecommerce.core.Resource
-import com.firebase.ecommerce.feature_wishlist.DeleteSignInState
-import com.firebase.ecommerce.feature_wishlist.WishListSignInState
-import com.firebase.ecommerce.feature_wishlist.domain.WishlistItemModel
-import com.firebase.ecommerce.feature_wishlist.domain.usecases.DeleteWishlistItemUsecase
-import com.firebase.ecommerce.feature_wishlist.domain.usecases.GetDataForWishlistItemUsecase
+import com.firebase.ecommerce.feature_cart.domain.use_case.GetDataForCartItemsUseCase
+import com.firebase.ecommerce.feature_cart.domain.model.CartItem
+import com.firebase.ecommerce.feature_cart.domain.use_case.CartItemDeleteUseCase
+import com.firebase.ecommerce.feature_cart.presentation.signInState.CartSignInState
+import com.firebase.ecommerce.feature_cart.presentation.signInState.DeleteSignInState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -17,55 +17,47 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class WishListViewModel @Inject constructor(
-    private val wishlistItemUsecase: GetDataForWishlistItemUsecase,
-    private val deleteWishlistItemUsecase: DeleteWishlistItemUsecase,
-) :
-    ViewModel() {
-
-    private val _getDataInState = Channel<WishListSignInState>()
+class CartViewModel @Inject constructor(private val getDataForCartItemsUseCase: GetDataForCartItemsUseCase, private val cartItemDeleteUseCase: CartItemDeleteUseCase): ViewModel(){
+    private val _getDataInState = Channel<CartSignInState>()
     val getDataInState = _getDataInState.receiveAsFlow()
-
     private val _deleteItemInState = Channel<DeleteSignInState>()
     val deleteItemInState = _deleteItemInState.receiveAsFlow()
-
     @SuppressLint("SuspiciousIndentation")
+
     suspend fun getData() {
         viewModelScope.launch {
-            wishlistItemUsecase.getWishlistData()
+       getDataForCartItemsUseCase.getData()
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _getDataInState.send(WishListSignInState(isSuccess = result.data as ArrayList<WishlistItemModel>))
-                            Log.e("wishlist", "${result.data}")
+                            _getDataInState.send(CartSignInState(isSuccess = result.data as ArrayList<CartItem>))
                         }
-
                         is Resource.Loading -> {
-                            _getDataInState.send(WishListSignInState(isLoading = true))
+                            _getDataInState.send(CartSignInState(isLoading = true))
                         }
-
                         is Resource.Error -> {
-                            _getDataInState.send(WishListSignInState(isError = result.message))
+                            _getDataInState.send(CartSignInState(isError = result.message))
                         }
                     }
                 }
         }
 
+
+
+
     }
 
-    suspend fun deleteWishlistItem(documentPath: String) {
+    suspend fun deleteCartItem(documentPath:String,context:Context) {
         viewModelScope.launch {
-            deleteWishlistItemUsecase.deleteWishlistItem(documentPath)
+            cartItemDeleteUseCase.deleteCartItem(documentPath, context = context)
                 .collect { result ->
                     when (result) {
                         is Resource.Success -> {
-                            _deleteItemInState.send(DeleteSignInState(isSuccess = "successfully deleted"))
+                            _deleteItemInState.send(DeleteSignInState(isSuccess ="successfully deleted"))
                         }
-
                         is Resource.Loading -> {
                             _deleteItemInState.send(DeleteSignInState(isLoading = true))
                         }
-
                         is Resource.Error -> {
                             _deleteItemInState.send(DeleteSignInState(isError = result.message))
                         }
@@ -73,6 +65,12 @@ class WishListViewModel @Inject constructor(
                 }
         }
 
+
+
+
     }
+
+
+
 
 }

@@ -8,3 +8,8 @@ data class WishListSignInState(
     val isError: String? = ""
 )
 
+data class DeleteSignInState(
+    val isLoading: Boolean = false,
+    val isSuccess: String?= null,
+    val isError: String? = ""
+)
