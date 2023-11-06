@@ -49,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
@@ -226,6 +227,12 @@ cartViewModel: CartViewModel = hiltViewModel()
                         .wrapContentSize()
                         .clickable {
                             colorChange = !colorChange
+                            if (colorChange) {
+                                viewModel.addToWishlistData(item)
+                            }
+                            else{
+                                viewModel.deleteWishlistItem("${item.title}-${item.id}")
+                            }
                         }, tint = if (colorChange) Color.Red else Color.Gray
                 )
             }

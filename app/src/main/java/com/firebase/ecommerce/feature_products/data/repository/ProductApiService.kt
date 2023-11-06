@@ -8,5 +8,4 @@ interface ProductApiService {
     @GET("{id}")
     suspend fun getProducts(@Path("id") id: String): ProductsListDto
 
-
 }

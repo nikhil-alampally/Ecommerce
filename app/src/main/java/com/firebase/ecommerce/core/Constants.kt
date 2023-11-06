@@ -20,4 +20,5 @@ object Constants
     const val cartItemInternalCollectionPath="cart_items"
     const val cartScreen="cart"
     const val homeScreen="home"
+    const val wishlistScreen="wishlist"
 }
