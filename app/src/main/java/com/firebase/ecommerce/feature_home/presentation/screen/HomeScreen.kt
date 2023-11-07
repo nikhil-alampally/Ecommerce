@@ -333,7 +333,7 @@ fun BottomNavigation(navController: NavHostController) {
                 HomeScreen(navController = navController)
             }
             if (selectedScreen == Constants.cartScreen) {
-                CartScreen()
+                CartScreen(navController=navController)
             }
 
         }
