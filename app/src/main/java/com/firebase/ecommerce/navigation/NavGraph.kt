@@ -21,6 +21,7 @@ import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.screens.ProductScreen
 import com.firebase.ecommerce.feature_profile.presentation.screens.ProfileScreen
 import com.firebase.ecommerce.feature_profile.presentation.screens.getData
+import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -101,7 +102,12 @@ fun NavGraph() {
                 currentStepScreen = if(currentStep!=null) currentStep else 1
 
 
+
                 )
+
+        }
+        composable(NavRoute.WishlistScreen.route){
+            WishlistScreen(navHostController = navController)
         }
     }
 }

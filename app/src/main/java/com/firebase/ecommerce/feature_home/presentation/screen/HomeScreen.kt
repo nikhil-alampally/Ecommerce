@@ -66,6 +66,7 @@ import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_home.presentation.viewmodel.HomeViewModel
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_profile.presentation.screens.setData
+import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -304,7 +305,7 @@ fun CategorySingleItem(title: String, image: Painter, cardColor: Color, onItemCl
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun BottomNavigation(navController: NavHostController) {
-    val screens = listOf(Constants.homeScreen, Constants.cartScreen)
+    val screens = listOf(Constants.homeScreen, Constants.cartScreen, Constants.wishlistScreen)
     var selectedScreen by remember { mutableStateOf(screens.first()) }
 
     Scaffold(
@@ -335,6 +336,9 @@ fun BottomNavigation(navController: NavHostController) {
             if (selectedScreen == Constants.cartScreen) {
                 CartScreen(navController=navController)
             }
+            if (selectedScreen == Constants.wishlistScreen) {
+                WishlistScreen(navHostController = navController)
+            }
 
         }
     )
@@ -345,6 +349,7 @@ fun getIconForScreen(screen: String): Painter {
     return when (screen) {
         Constants.homeScreen -> painterResource(id = R.drawable.baseline_home_24)
         Constants.cartScreen -> painterResource(id = R.drawable.baseline_shopping_cart_24)
+        Constants.wishlistScreen -> painterResource(id = R.drawable.baseline_favorite_24)
         else -> painterResource(id = R.drawable.baseline_home_24)
     }
 }
