@@ -15,6 +15,8 @@ import com.firebase.ecommerce.feature_products.presentation.screens.DetailScreen
 import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
+import com.firebase.ecommerce.feature_placeorder.presentaion.AddAddress
+import com.firebase.ecommerce.feature_placeorder.presentaion.MainScreen
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.screens.ProductScreen
 import com.firebase.ecommerce.feature_profile.presentation.screens.ProfileScreen
@@ -91,11 +93,22 @@ fun NavGraph() {
                 ProfileScreen(navController = navController, profileData = profileData, context = context )
             }
         }
+        composable(NavRoute.PlaceOrder.route){
+          val currentStep=  navController.getData<Int>("currentStep")
+            MainScreen(
+                    addAddress = { AddAddress(navController = navController) },
+                    placeOrder = {  },
+                orderSummary = {},
+                currentStepScreen = if(currentStep!=null) currentStep else 1
+
+
+
+                )
+
+        }
         composable(NavRoute.WishlistScreen.route){
             WishlistScreen(navHostController = navController)
         }
-
-
     }
 }
 

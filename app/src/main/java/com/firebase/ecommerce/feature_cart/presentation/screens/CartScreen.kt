@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -58,6 +59,7 @@ import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_cart.domain.model.CartItem
 import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
+import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -67,7 +69,7 @@ import kotlinx.coroutines.launch
     "UnusedMaterial3ScaffoldPaddingParameter"
 )
 @Composable
-fun CartScreen(viewModel: CartViewModel = hiltViewModel()) {
+fun CartScreen(viewModel: CartViewModel = hiltViewModel(),navController: NavController) {
     var itemsList by remember {
         mutableStateOf<ArrayList<CartItem>?>(null)
     }
@@ -171,7 +173,9 @@ fun CartScreen(viewModel: CartViewModel = hiltViewModel()) {
                         color = Color.White
                     )
                     Button(
-                        onClick = {},
+                        onClick = {
+                               navController.navigate(NavRoute.PlaceOrder.route)
+                        },
                         modifier = Modifier.padding(dimensionResource(id = R.dimen.five)),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0XFFE75480)

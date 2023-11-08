@@ -41,10 +41,6 @@ class CartViewModel @Inject constructor(private val getDataForCartItemsUseCase: 
                     }
                 }
         }
-
-
-
-
     }
 
     suspend fun deleteCartItem(documentPath:String,context:Context) {

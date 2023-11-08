@@ -57,4 +57,19 @@
     <string name="PlaceOrder">Place Order</string>
     <string name="DeletedSuccessfully">Deleted successfully</string>
     <string name="goToCart">go to cart</string>
+    <string name="home">home</string>
+    <string name="next">next</string>
+    <string name="previous">previous</string>
+    <string name="addAddress">AddAddress</string>
+    <string name="saveAddress">saveAddress</string>
+    <string name="TypeOfAddress">Type of Address</string>
+    <string name="work">work</string>
+    <string name="other">other</string>
+    <string name="houseNumber">House No,Building Name</string>
+    <string name="area">Area/Locality/Colony</string>
+    <string name="state">State</string>
+    <string name="pinCode">PinCode</string>
+    <string name="selectAddress">Select Address</string>
+   <string name="delete">delete</string>
+    <string name="edit">edit</string>
 </resources>
