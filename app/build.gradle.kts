@@ -2,9 +2,9 @@ plugins {
     kotlin("kapt")
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("com.google.dagger.hilt.android")
+    id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
-    id ("kotlin-parcelize")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -67,12 +67,12 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("com.google.firebase:firebase-auth:21.1.0")
-    implementation ("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
     implementation(platform("com.google.firebase:firebase-bom:30.3.2"))
-    implementation ("com.google.firebase:firebase-auth-ktx:21.1.0")
+    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
 
     //hilt
-    implementation ("com.google.dagger:hilt-android:2.44")
+    implementation("com.google.dagger:hilt-android:2.44")
     implementation("com.google.firebase:firebase-firestore:24.4.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
@@ -86,27 +86,30 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    implementation ("androidx.navigation:navigation-compose:2.5.0")
+    implementation("androidx.navigation:navigation-compose:2.5.0")
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation ("com.google.accompanist:accompanist-navigation-animation:0.28.0")
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.28.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     // Retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
-    implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 
 
     //coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
-    implementation ("androidx.compose.ui:ui:$1.4.3")
-    implementation ("androidx.compose.material:material:$1.4.3")
+    implementation("androidx.compose.ui:ui:$1.4.3")
+    implementation("androidx.compose.material:material:$1.4.3")
 
-    implementation ("com.google.firebase:firebase-core:21.1.1")
+    implementation("com.google.firebase:firebase-core:21.1.1")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-storage-ktx")
-    implementation ("com.airbnb.android:lottie-compose:4.0.0")
-    implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("com.airbnb.android:lottie-compose:4.0.0")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    implementation("com.razorpay:checkout:1.6.33")
+
 
 }

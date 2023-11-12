@@ -243,6 +243,7 @@ fun AddAddress(viewModel: AddAddressViewModel = hiltViewModel(), navController: 
                         scope.launch {
                             viewModel.getData()
                         }
+
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.background),
                     modifier = Modifier
@@ -371,7 +372,13 @@ fun AddAddressCard(
                 .fillMaxWidth()
                 .padding(dimensionResource(id = R.dimen.ten))
                 .clickable {
+                    val totalPrice: Int? = navController.previousBackStackEntry?.savedStateHandle?.get("totalPrice")
+                    val totalPriceWithQuantity: Int? =
+                        navController.previousBackStackEntry?.savedStateHandle?.get("totalPriceWithQuantity")
+                    navController.currentBackStackEntry?.savedStateHandle?.set("totalPrice", totalPrice)
+                    navController.currentBackStackEntry?.savedStateHandle?.set("totalPriceWithQuantity", totalPriceWithQuantity)
                     navController.setData(Constants.currentStep, 2)
+                    navController.setData("Add_address", addAddress)
                     viewModel.saveAddress(addAddress)
                     navController.navigate(NavRoute.PlaceOrder.route)
                 }
@@ -539,7 +546,7 @@ fun ChipSelectionList(items: List<String>, onItemSelected: (String) -> Unit = {}
 fun MainScreen(
     modifier: Modifier = Modifier,
     addAddress: @Composable () -> Unit = {},
-    placeOrder: @Composable () -> Unit = {},
+    payment: @Composable () -> Unit = {},
     orderSummary: @Composable () -> Unit = {},
     currentStepScreen: Int = 1
 ) {
@@ -573,7 +580,7 @@ fun MainScreen(
             when (currentStep) {
                 1 -> addAddress.invoke()
                 2 -> orderSummary.invoke()
-                3 -> placeOrder.invoke()
+                3 -> payment.invoke()
             }
         }
 

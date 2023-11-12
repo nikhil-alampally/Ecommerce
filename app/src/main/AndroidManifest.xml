@@ -28,6 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.razorpay.ApiKey"
+            android:value="rzp_test_OMm5SaotmHVWcA"/>
+        <meta-data
+            android:name="com.google.gms.wallet.api.enabled"
+            android:value="true"/>
     </application>
 
 </manifest>

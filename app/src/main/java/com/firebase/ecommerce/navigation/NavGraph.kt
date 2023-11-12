@@ -1,5 +1,9 @@
 package com.firebase.ecommerce.navigation
 
+import OrderSummary
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
@@ -9,12 +13,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
+import com.firebase.ecommerce.MainActivity
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.feature_cart.presentation.screens.PaymentSuccessScreen
 import com.firebase.ecommerce.feature_home.presentation.screen.BottomNavigation
 import com.firebase.ecommerce.feature_products.presentation.screens.DetailScreen
 import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
+import com.firebase.ecommerce.feature_placeorder.data.AddAddress
 import com.firebase.ecommerce.feature_placeorder.presentaion.AddAddress
 import com.firebase.ecommerce.feature_placeorder.presentaion.MainScreen
 import com.firebase.ecommerce.feature_products.domain.model.Product
@@ -29,9 +36,10 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 val tweenSpec =
     tween<IntOffset>(durationMillis = 500, easing = CubicBezierEasing(0.08f, 0.93f, 0.68f, 1.27f))
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NavGraph() {
+fun NavGraph(mainActivity: MainActivity, activity: Activity) {
     val navController = rememberAnimatedNavController()
     AnimatedNavHost(
         navController = navController, startDestination = NavRoute.LoginScreen.route
@@ -95,13 +103,17 @@ fun NavGraph() {
         }
         composable(NavRoute.PlaceOrder.route){
           val currentStep=  navController.getData<Int>("currentStep")
+            val addAddress=  navController.getData<AddAddress>("Add_address")
+            Log.d("address data","$addAddress")
             MainScreen(
                     addAddress = { AddAddress(navController = navController) },
-                    placeOrder = {  },
-                orderSummary = {},
+                    payment = { PaymentSuccessScreen() },
+                orderSummary = {
+                    if (addAddress != null) {
+                        OrderSummary(activity = activity, navController = navController, addAddress = addAddress)
+                    }
+                },
                 currentStepScreen = if(currentStep!=null) currentStep else 1
-
-
 
                 )
 

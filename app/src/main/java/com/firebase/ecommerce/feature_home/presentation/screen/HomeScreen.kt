@@ -358,4 +358,6 @@ fun <T> NavHostController.setData(key: String, value: T) {
     currentBackStackEntry?.savedStateHandle?.set(key, value)
 }
 
-
+fun <T> NavHostController.getData(key: String): T? {
+    return previousBackStackEntry?.savedStateHandle?.get<T>(key)
+}

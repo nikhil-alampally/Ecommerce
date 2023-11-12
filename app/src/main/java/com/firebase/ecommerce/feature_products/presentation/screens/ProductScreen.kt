@@ -58,7 +58,6 @@ import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_cart.domain.model.CartItem
 import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
-
 import com.firebase.ecommerce.feature_home.presentation.screen.setData
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
@@ -285,6 +284,7 @@ cartViewModel: CartViewModel = hiltViewModel()
                 RatingBarHalfStar(currentRating = item.rating.toFloat(), onRatingChanged = {})
                 Button(
                     onClick = {
+                        item.quantity=1
                        count++
                         if(goToCart==true){
                         navController.popBackStack()
