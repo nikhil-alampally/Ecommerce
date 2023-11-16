@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_placeorder.presentaion
+package com.firebase.ecommerce.feature_placeorder.presentaion.screens
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
@@ -60,6 +60,8 @@ import com.firebase.ecommerce.feature_home.domain.model.HomeData
 import com.firebase.ecommerce.feature_home.presentation.screen.setData
 import com.firebase.ecommerce.feature_home.presentation.viewmodel.HomeViewModel
 import com.firebase.ecommerce.feature_placeorder.data.AddAddress
+import com.firebase.ecommerce.feature_placeorder.presentaion.viewmodel.AddAddressViewModel
+import com.firebase.ecommerce.feature_placeorder.presentaion.screens.Stepper
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -302,6 +304,14 @@ fun AddAddress(viewModel: AddAddressViewModel = hiltViewModel(), navController: 
                                 onDeleteClick = { deletedAddress ->
                                     deletedItem = deletedAddress
                                 },
+                                onItemSelected = {
+                                    addressDetails!!.forEach {
+                                        it.isSelected=false
+                                       viewModel.addAddressData(it,context)
+                                    }
+                                    address.isSelected=!address.isSelected
+                                    viewModel.addAddressData(address,context)
+                                },
                                 navController = navController,
                             )
                         }
@@ -348,7 +358,9 @@ fun AddAddressCard(
     onEditClick: (AddAddress) -> Unit,
     onDeleteClick: (AddAddress) -> Unit,
     navController: NavHostController,
+    onItemSelected: () -> Unit={}
 ) {
+
     var profileData: HomeData? by remember {
         mutableStateOf(null)
     }
@@ -372,6 +384,7 @@ fun AddAddressCard(
                 .fillMaxWidth()
                 .padding(dimensionResource(id = R.dimen.ten))
                 .clickable {
+                    onItemSelected.invoke()
                     val totalPrice: Int? = navController.previousBackStackEntry?.savedStateHandle?.get("totalPrice")
                     val totalPriceWithQuantity: Int? =
                         navController.previousBackStackEntry?.savedStateHandle?.get("totalPriceWithQuantity")
@@ -589,9 +602,10 @@ fun MainScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
 
-            Button(
+        /*    Button(
                 onClick = { if (currentStep > 1) currentStep-- },
                 enabled = currentStep > 1,
+                modifier = Modifier.clip(RoundedCornerShape(15.dp))
             ) {
                 Text(
                     text = stringResource(id = R.string.previous),
@@ -601,12 +615,13 @@ fun MainScreen(
             Button(
                 onClick = { if (currentStep < numberStep) currentStep++ },
                 enabled = currentStep < numberStep,
+                modifier = Modifier.clip(RoundedCornerShape(15.dp))
             ) {
                 Text(
                     text = stringResource(id = R.string.next),
                     color = Color.White
                 )
-            }
+            }*/
 
         }
     }

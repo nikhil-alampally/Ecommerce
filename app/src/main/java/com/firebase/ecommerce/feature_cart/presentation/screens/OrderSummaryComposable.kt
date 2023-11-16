@@ -1,5 +1,6 @@
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.icu.text.SimpleDateFormat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -45,13 +46,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
+import com.firebase.ecommerce.core.StoreData
+import com.firebase.ecommerce.feature_cart.data.repository.OrderDetails
 import com.firebase.ecommerce.feature_cart.domain.model.CartItem
 import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
 import com.firebase.ecommerce.feature_placeorder.data.AddAddress
-import com.firebase.ecommerce.feature_placeorder.presentaion.AddAddressViewModel
 import com.razorpay.Checkout
 import kotlinx.coroutines.launch
 import org.json.JSONObject
+import java.util.Date
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
@@ -64,14 +67,13 @@ fun OrderSummary(
     var itemsList by remember {
         mutableStateOf<ArrayList<CartItem>?>(null)
     }
+
     val shippingCost = 50
     val tax = 10
 
     val totalPrice: Int? = navController.previousBackStackEntry?.savedStateHandle?.get("totalPrice")
     val totalPriceWithQuantity: Int? =
         navController.previousBackStackEntry?.savedStateHandle?.get("totalPriceWithQuantity")
-
-    Log.d("summary data", "Total Price: $totalPrice")
 
     val subtotal by remember {
         mutableStateOf((totalPrice ?: 0) + (totalPriceWithQuantity ?: 0))
@@ -80,7 +82,6 @@ fun OrderSummary(
     val total: Int = remember {
         subtotal + shippingCost + tax
     }
-    val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = Unit, block = {
@@ -142,7 +143,9 @@ fun OrderSummary(
         Spacer(modifier = Modifier.size(5.dp))
         Row() {
             Button(
-                onClick = { makePayment(activity, total.toString()) }, modifier = Modifier
+                onClick = {
+                    makePayment(activity, total.toString())
+                          }, modifier = Modifier
                     .align(CenterVertically)
                     .padding(start = 100.dp, end = 50.dp)
             ) {
@@ -157,6 +160,7 @@ fun OrderSummary(
 fun OrderSummaryItem(
     item: List<CartItem>,
     viewModel: CartViewModel = hiltViewModel(),
+
 ) {
 
     val scope = rememberCoroutineScope()
@@ -169,6 +173,7 @@ fun OrderSummaryItem(
 
     LazyColumn(modifier = Modifier.fillMaxHeight(0.65f)) {
         items(item) { item ->
+
             Card(
                 modifier = Modifier
                     .wrapContentSize()
@@ -262,6 +267,7 @@ fun CostDetails(
 fun makePayment(activity: Activity, amount: String) {
     val co = Checkout()
 
+
     try {
         val options = JSONObject()
         options.put("name", "Ecommerce App")
@@ -271,12 +277,14 @@ fun makePayment(activity: Activity, amount: String) {
         options.put("currency", "INR")
         options.put("amount", amount + "00")
 
+
         val prefill = JSONObject()
         prefill.put("email", "")
         prefill.put("contact", "")
 
         options.put("prefill", prefill)
         co.open(activity, options)
+
     } catch (e: Exception) {
         Toast.makeText(activity, "Error in payment: " + e.message, Toast.LENGTH_LONG).show()
         e.printStackTrace()

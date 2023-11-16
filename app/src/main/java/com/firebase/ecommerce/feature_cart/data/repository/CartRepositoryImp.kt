@@ -1,6 +1,7 @@
 package com.firebase.ecommerce.feature_cart.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.core.Resource
@@ -14,7 +15,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
-class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, private val fireBase:Firebase):
+class CartRepositoryImp @Inject constructor(
+    private val dataStore: StoreData,
+    private val fireBase: Firebase
+) :
     CartRepository {
     override fun getDataForCartItems(): Flow<Resource<Any>> {
         return callbackFlow {
@@ -23,8 +27,11 @@ class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, pri
                 dataStore.getData.collect {
                     if (it != null) {
                         val docRef =
-                            it.let { it1 -> fireBase.firestore.collection("Cartitems").document(it1) }
-                        .collection("cart_items").get()
+                            it.let { it1 ->
+                                fireBase.firestore.collection(Constants.cartItemCollectionPath)
+                                    .document(it1)
+                            }
+                                .collection(Constants.cartItemInternalCollectionPath).get()
                         docRef.addOnFailureListener {
                             trySend(Resource.Error(message = it.localizedMessage))
 
@@ -34,6 +41,7 @@ class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, pri
                             for (document in querySnapshot.documents) {
                                 val product = document.toObject<CartItem>(CartItem::class.java)
                                 if (product != null) {
+
                                     cartItemList.add(product)
                                 }
                             }
@@ -52,25 +60,63 @@ class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, pri
 
     }
 
-
-
-    override fun deleteCartItem(documentPath:String,context: Context): Flow<Resource<Any>> {
+    override fun getOrdersData(): Flow<Resource<Any>> {
         return callbackFlow {
             trySend(Resource.Loading(true))
             try {
-                dataStore.getData.collect { userId->
+                dataStore.getData.collect {
+                    if (it != null) {
+                        val docRef =
+                            it.let { it1 ->
+                                fireBase.firestore.collection(Constants.orderSummaryCollectionPath)
+                                    .document(it1)
+                            }
+                                .collection(Constants.orderSummaryInternalCollectionPath).get()
+                        docRef.addOnFailureListener {
+                            trySend(Resource.Error(message = it.localizedMessage))
+                        }.addOnSuccessListener { querySnapshot ->
+                            val ordersList = mutableListOf<OrderDetails>()
+                            for (document in querySnapshot.documents) {
+                                val product =
+                                    document.toObject<OrderDetails>(OrderDetails::class.java)
+                                if (product != null) {
+                                    ordersList.add(product)
+                                }
+                            }
+                            trySend(Resource.Success(data = ordersList))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
+            }
+            awaitClose {
+                close()
+            }
+        }
+
+    }
+
+    override fun deleteCartItem(documentPath: String, context: Context): Flow<Resource<Any>> {
+        return callbackFlow {
+            trySend(Resource.Loading(true))
+            try {
+                dataStore.getData.collect { userId ->
                     if (userId != null) {
                         val docRef =
-                            userId.let { fireBase.firestore.collection( Constants.cartItemCollectionPath).document(it) }
-                                .collection(Constants.cartItemInternalCollectionPath).document(documentPath).delete()
+                            userId.let {
+                                fireBase.firestore.collection(Constants.cartItemCollectionPath)
+                                    .document(it)
+                            }
+                                .collection(Constants.cartItemInternalCollectionPath)
+                                .document(documentPath).delete()
                         docRef.addOnFailureListener {
                             trySend(Resource.Error(message = it.localizedMessage))
 
                         }.addOnSuccessListener {
-                            trySend(Resource.Success(data =context.getString(R.string.DeletedSuccessfully)))
+                            trySend(Resource.Success(data = context.getString(R.string.DeletedSuccessfully)))
                         }
                     }
-
                 }
             } catch (e: Exception) {
                 trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
@@ -81,5 +127,34 @@ class CartRepositoryImp @Inject constructor(private val dataStore:StoreData, pri
         }
     }
 
+    override fun addOrderSummary(orderDetails: OrderDetails): Flow<Resource<Any>> {
+        return callbackFlow {
+            trySend(Resource.Loading(true))
+            try {
+                dataStore.getData.collect { value ->
+                    if (value != null) {
+                        val docRef =
+                            value.let { it1 ->
+                                fireBase.firestore.collection(Constants.orderSummaryCollectionPath)
+                                    .document(it1).collection(
+                                    Constants.cartItemInternalCollectionPath
+                                )
+                            }
+                        docRef.document(orderDetails.cartId).set(orderDetails)
+                            .addOnFailureListener {
+                                trySend(Resource.Error(message = it.localizedMessage))
+                            }.addOnSuccessListener {
+                            trySend(Resource.Success(data = value))
+                        }
+                    }
 
+                }
+            } catch (e: java.lang.Exception) {
+                trySend(Resource.Error(message = e.localizedMessage.orEmpty()))
+            }
+            awaitClose {
+                close()
+            }
+        }
+    }
 }

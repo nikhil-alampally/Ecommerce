@@ -1,6 +1,9 @@
 package com.firebase.ecommerce.feature_home.presentation.screen
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -47,6 +50,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
@@ -70,6 +75,7 @@ import com.firebase.ecommerce.feature_wishlist.presentation.WishlistScreen
 import com.firebase.ecommerce.navigation.NavRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -176,7 +182,7 @@ fun HomeScreenContent(
                     }
             )
             AssistChip(
-                onClick = { },
+                onClick = { navController.navigate(NavRoute.Orders.route)},
                 label = { Text(stringResource(id = R.string.orders)) },
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = Color.LightGray.copy(
@@ -196,7 +202,9 @@ fun HomeScreenContent(
         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.twenty)))
 
         Text(
-            text = if(profileData?.userName!=null){"WELCOME ${profileData?.userName}"} else "",
+            text = if (profileData?.userName != null) {
+                "WELCOME ${profileData?.userName}"
+            } else "",
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = dimensionResource(R.dimen.thirty)),
@@ -237,7 +245,12 @@ fun HomeScreenContent(
 
 
 @Composable
-fun CategorySingleItem(title: String, image: Painter, cardColor: Color, onItemClick: () -> Unit = {}) {
+fun CategorySingleItem(
+    title: String,
+    image: Painter,
+    cardColor: Color,
+    onItemClick: () -> Unit = {}
+) {
 
     Card(
         modifier = Modifier
@@ -304,13 +317,37 @@ fun CategorySingleItem(title: String, image: Painter, cardColor: Color, onItemCl
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun BottomNavigation(navController: NavHostController) {
-    val screens = listOf(Constants.homeScreen, Constants.cartScreen, Constants.wishlistScreen)
-    var selectedScreen by remember { mutableStateOf(screens.first()) }
+fun BottomNavigation(
+    navController: NavHostController,
+    selectedScreens: String = Constants.homeScreen,
 
+
+    ) {
+
+
+    val context = LocalContext.current as Activity
+
+    val screens = listOf(Constants.homeScreen, Constants.cartScreen, Constants.wishlistScreen)
+    var selectedScreen by remember { mutableStateOf(selectedScreens) }
+    val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            val navigationStackRoute = navBackStackEntry?.destination?.route
+            if (selectedScreen == Constants.homeScreen && navigationStackRoute == Constants.homeScreen) {
+                context.finish()
+            } else {
+                navController.popBackStack()
+
+            }
+
+        }
+    }
+    onBackPressedDispatcher?.addCallback(callback)
     Scaffold(
         bottomBar = {
-            NavigationBar() {
+            NavigationBar {
                 screens.forEach { screen ->
                     NavigationBarItem(
                         icon = {
@@ -334,7 +371,7 @@ fun BottomNavigation(navController: NavHostController) {
                 HomeScreen(navController = navController)
             }
             if (selectedScreen == Constants.cartScreen) {
-                CartScreen(navController=navController)
+                CartScreen(navController = navController)
             }
             if (selectedScreen == Constants.wishlistScreen) {
                 WishlistScreen(navHostController = navController)

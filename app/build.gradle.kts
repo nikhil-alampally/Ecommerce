@@ -75,6 +75,9 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.44")
     implementation("com.google.firebase:firebase-firestore:24.4.1")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     kapt("com.google.dagger:hilt-android-compiler:2.44")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     testImplementation("junit:junit:4.13.2")
@@ -99,17 +102,15 @@ dependencies {
 
     //coil
     implementation("io.coil-kt:coil-compose:2.4.0")
-
     implementation("androidx.compose.ui:ui:$1.4.3")
     implementation("androidx.compose.material:material:$1.4.3")
-
     implementation("com.google.firebase:firebase-core:21.1.1")
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-storage-ktx")
     implementation("com.airbnb.android:lottie-compose:4.0.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-
     implementation("com.razorpay:checkout:1.6.33")
+
 
 
 }

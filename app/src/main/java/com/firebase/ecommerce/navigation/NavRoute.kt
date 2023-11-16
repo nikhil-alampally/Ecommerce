@@ -9,5 +9,7 @@ sealed class  NavRoute(val route:String) {
     object ProfileScreen:NavRoute("profile")
     object PlaceOrder:NavRoute("placeOrder")
     object WishlistScreen:NavRoute("Wishlist")
-    object OrderSummaryScreen:NavRoute("Summary")
+    object Orders:NavRoute("OrderSummary")
+    object SplashScreen:NavRoute("SplashScreen")
+
 }

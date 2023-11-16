@@ -13,17 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
-import com.firebase.ecommerce.MainActivity
+import com.firebase.ecommerce.SplashScreen
 import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.feature_cart.presentation.screens.PaymentSuccessScreen
 import com.firebase.ecommerce.feature_home.presentation.screen.BottomNavigation
 import com.firebase.ecommerce.feature_products.presentation.screens.DetailScreen
 import com.firebase.ecommerce.feature_home.domain.model.HomeData
+import com.firebase.ecommerce.feature_home.presentation.Orders
 import com.firebase.ecommerce.feature_login.presentation.screens.LoginScreen
 import com.firebase.ecommerce.feature_login.presentation.screens.RegistrationScreen
 import com.firebase.ecommerce.feature_placeorder.data.AddAddress
-import com.firebase.ecommerce.feature_placeorder.presentaion.AddAddress
-import com.firebase.ecommerce.feature_placeorder.presentaion.MainScreen
+import com.firebase.ecommerce.feature_placeorder.presentaion.screens.AddAddress
+import com.firebase.ecommerce.feature_placeorder.presentaion.screens.MainScreen
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.screens.ProductScreen
 import com.firebase.ecommerce.feature_profile.presentation.screens.ProfileScreen
@@ -39,15 +40,24 @@ val tweenSpec =
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun NavGraph(mainActivity: MainActivity, activity: Activity) {
+fun NavGraph(
+    activity: Activity,
+) {
     val navController = rememberAnimatedNavController()
     AnimatedNavHost(
-        navController = navController, startDestination = NavRoute.LoginScreen.route
+        navController = navController, startDestination = NavRoute.SplashScreen.route
     ) {
 
         composable(NavRoute.RegisterScreen.route) {
             RegistrationScreen(navigateToLogin = {
                 navController.navigate(NavRoute.LoginScreen.route)
+            })
+        }
+        composable(NavRoute.SplashScreen.route){
+            SplashScreen(navigateToHomeScreen = {
+                navController.navigate(NavRoute.HomeScreen.route)
+            }, navigateToRegistration = {
+                navController.navigate(NavRoute.RegisterScreen.route)
             })
         }
         composable(NavRoute.LoginScreen.route) {
@@ -59,7 +69,11 @@ fun NavGraph(mainActivity: MainActivity, activity: Activity) {
             })
         }
         composable(NavRoute.HomeScreen.route){
-            BottomNavigation(navController = navController)
+          val selectedScreen=  navController.getData<String>(Constants.cartScreen)
+            val wishListScreen=navController.getData<String>(Constants.wishlistScreen)
+            BottomNavigation(
+                navController = navController, selectedScreens =if(selectedScreen==null){ Constants.homeScreen; if(wishListScreen!=null)wishListScreen else Constants.homeScreen
+            } else selectedScreen )
 
         }
 
@@ -89,8 +103,14 @@ fun NavGraph(mainActivity: MainActivity, activity: Activity) {
         }
         composable(NavRoute.DetailsScreen.route){
             navController.getData<Product>(Constants.ITEMSLIST).let{
+             val cartValidation=   navController.getData<Boolean>("CartValidation")
+                val wishListValidation=   navController.getData<Boolean>("wishListValidation")
                 if (it != null) {
-                    DetailScreen(it,navController)
+                    if (cartValidation != null) {
+                        if (wishListValidation != null) {
+                            DetailScreen(it,navController,cartValidation=cartValidation,wishListValidation)
+                        }
+                    }
                 }
             }
         }
@@ -109,6 +129,7 @@ fun NavGraph(mainActivity: MainActivity, activity: Activity) {
                     addAddress = { AddAddress(navController = navController) },
                     payment = { PaymentSuccessScreen() },
                 orderSummary = {
+
                     if (addAddress != null) {
                         OrderSummary(activity = activity, navController = navController, addAddress = addAddress)
                     }
@@ -120,6 +141,9 @@ fun NavGraph(mainActivity: MainActivity, activity: Activity) {
         }
         composable(NavRoute.WishlistScreen.route){
             WishlistScreen(navHostController = navController)
+        }
+        composable(NavRoute.Orders.route){
+            Orders()
         }
     }
 }
