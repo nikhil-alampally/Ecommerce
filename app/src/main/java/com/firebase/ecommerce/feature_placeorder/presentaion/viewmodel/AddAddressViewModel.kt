@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_placeorder.presentaion
+package com.firebase.ecommerce.feature_placeorder.presentaion.viewmodel
 
 import android.content.Context
 import androidx.compose.runtime.MutableState
@@ -12,6 +12,9 @@ import com.firebase.ecommerce.feature_cart.presentation.signInState.AddressSignI
 import com.firebase.ecommerce.feature_cart.presentation.signInState.DeleteSignInState
 import com.firebase.ecommerce.feature_login.presentation.SignInState
 import com.firebase.ecommerce.feature_placeorder.data.AddAddress
+import com.firebase.ecommerce.feature_placeorder.domain.use_case.AddAddressUseCase
+import com.firebase.ecommerce.feature_placeorder.domain.use_case.DeleteAddressFromFirebase
+import com.firebase.ecommerce.feature_placeorder.domain.use_case.GetAddressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -66,7 +69,6 @@ class AddAddressViewModel @Inject constructor(
                     is Resource.Success -> {
                         _getDataInState.send(AddressSignInState(isSuccess = result.data as ArrayList<AddAddress>))
                     }
-
                     is Resource.Loading -> {
                         _getDataInState.send(AddressSignInState(isLoading = true))
                     }

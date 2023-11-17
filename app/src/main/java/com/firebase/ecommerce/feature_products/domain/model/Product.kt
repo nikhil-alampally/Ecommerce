@@ -15,5 +15,7 @@ data class Product(
     val rating: Double=0.00,
     val stock: Int=0,
     val thumbnail: String="",
-    val title: String=""
+    val title: String="",
+    var quantity: Int = 1,
+    var isSelected:Boolean=false
 ):Parcelable

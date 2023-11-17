@@ -1,4 +1,4 @@
-package com.firebase.ecommerce.feature_placeorder.domain
+package com.firebase.ecommerce.feature_placeorder.domain.repository
 
 import android.content.Context
 import com.firebase.ecommerce.core.Resource

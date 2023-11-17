@@ -70,6 +70,10 @@
     <string name="state">State</string>
     <string name="pinCode">PinCode</string>
     <string name="selectAddress">Select Address</string>
-   <string name="delete">delete</string>
+    <string name="delete">delete</string>
     <string name="edit">edit</string>
+    <string name="orderSummary">Order Summary</string>
+    <string name="addedToWishList">Added to WishList</string>
+    <string name="goToWishList">go to wishList</string>
+
 </resources>

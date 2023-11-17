@@ -17,6 +17,8 @@ object Constants
     const val PROFILE_IMAGE_NAME = "$UID.jpg"
     const val ALL_IMAGES = "image/*"
     const val cartItemCollectionPath="Cartitems"
+    const val orderSummaryCollectionPath="orderSummary"
+    const val orderSummaryInternalCollectionPath="orders"
     const val cartItemInternalCollectionPath="cart_items"
     const val cartScreen="cart"
     const val homeScreen="home"
@@ -28,4 +30,6 @@ object Constants
     const val home="home"
     const val work="work"
     const val other="other"
+    const val cartValidation="CartValidation"
+    const val wishListValidation="wishListValidation"
 }

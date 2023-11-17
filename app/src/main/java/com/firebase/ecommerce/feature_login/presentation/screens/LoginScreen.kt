@@ -188,7 +188,8 @@ fun LoginScreen(
 
                 }
                 if (url.isNotEmpty()) {
-                    navigateToHomeScreen.invoke()
+
+                   /* navigateToHomeScreen.invoke()*/
                 }
             })
 

@@ -1,7 +1,6 @@
 package com.firebase.ecommerce.feature_products.presentation.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -27,6 +26,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,37 +50,107 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.Constants
+import com.firebase.ecommerce.core.UiEvents
 import com.firebase.ecommerce.core.connectivityState
 import com.firebase.ecommerce.feature_cart.domain.model.CartItem
 import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
-
 import com.firebase.ecommerce.feature_home.presentation.screen.setData
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
 import com.firebase.ecommerce.feature_products.presentation.viewmodel.ProductViewModel
+import com.firebase.ecommerce.feature_wishlist.domain.WishlistItemModel
+import com.firebase.ecommerce.feature_wishlist.presentation.WishListViewModel
+import com.firebase.ecommerce.navigation.NavRoute
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
-
-
-
-@SuppressLint("MutableCollectionMutableState", "UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint(
+    "MutableCollectionMutableState", "UnusedMaterial3ScaffoldPaddingParameter",
+    "UnusedMaterialScaffoldPaddingParameter", "SuspiciousIndentation",
+    "CoroutineCreationDuringComposition"
+)
 @Composable
 fun ProductScreen(
     viewModel: ProductViewModel = hiltViewModel(),
     cartViewModel: CartViewModel = hiltViewModel(),
+    wishListViewModel: WishListViewModel = hiltViewModel(),
     category: String,
     navController: NavHostController,
     onItemClick: () -> Unit = {}
 ) {
 
-        val connection by connectivityState()
+
+    val connection by connectivityState()
+
+    var cartItemsList by remember {
+        mutableStateOf<ArrayList<CartItem>?>(null)
+    }
+    var wishListItems by remember {
+        mutableStateOf<ArrayList<WishlistItemModel>?>(null)
+    }
+
+    val items = viewModel.getData.collectAsState(initial = null)
+
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var itemsList by remember {
+        mutableStateOf<List<Product>?>(null)
+    }
+
+    val snackBarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    var chipsListCategory by remember {
+        mutableStateOf<List<String>?>(null)
+    }
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is UiEvents.SnackbarEvent -> {
+                    snackBarHostState.showSnackbar(event.message)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+
+    LaunchedEffect(key1 = Unit, key2 = viewModel.selectedCategory.value, block = {
+        viewModel.getProducts(category)
+        cartViewModel.getData()
+        wishListViewModel.getData()
+
+    })
+
+
+    LaunchedEffect(key1 = items.value?.products, block = {
+        scope.launch {
+
+            if (items.value?.products?.isNotEmpty() == true) {
+                itemsList = items.value!!.products
+                val categoryList = itemsList?.map { it.category }?.distinct()
+                val newList = mutableListOf("All")
+                if (categoryList != null) {
+                    newList.addAll(categoryList)
+                }
+                if (viewModel.selectedCategory.value == "All") {
+                    chipsListCategory = newList
+                }
+
+            }
+        }
+    })
+    Scaffold(snackbarHost = {
+        androidx.compose.material3.SnackbarHost(hostState = snackBarHostState)
+    }) {
+
         if (connection == ConnectionState.Unavailable) {
             var showDialog by remember {
                 mutableStateOf(true)
@@ -90,89 +161,88 @@ fun ProductScreen(
                 showDialog = showDialog
             )
         }
-    var cartItemsList by remember {
-        mutableStateOf<ArrayList<CartItem>?>(null)
-    }
-
-            val items = viewModel.getData.collectAsState(initial = null)
-
-
-            val scope = rememberCoroutineScope()
-            var itemsList by remember {
-                mutableStateOf<List<Product>?>(null)
+        Column {
+            Row {
+                chipsListCategory?.let { stringList ->
+                    Categories(
+                        categories = stringList,
+                        onSelectCategory = {
+                            viewModel.setCategory(it)
+                        },
+                        selectedCategory = viewModel.selectedCategory.value,
+                        navController = navController
+                    )
+                }
             }
-            var chipsListCategory by remember {
-                mutableStateOf<List<String>?>(null)
-            }
-            LaunchedEffect(key1 = Unit, key2 = viewModel.selectedCategory.value, block = {
-                viewModel.getProducts(category)
-                cartViewModel.getData()
+            LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
 
-            })
-
-            LaunchedEffect(key1 = items.value?.products, block = {
                 scope.launch {
-
-                    if (items.value?.products?.isNotEmpty() == true) {
-                        itemsList = items.value!!.products
-                        val categoryList= itemsList?.map { it.category }?.distinct()
-                        val newList = mutableListOf("All")
-                        if (categoryList != null) {
-                            newList.addAll(categoryList)
-                        }
-                        if (viewModel.selectedCategory.value == "All") {
-                            chipsListCategory = newList
-                        }
-
+                    /*  wishListViewModel.getData()*/
+                    cartViewModel.getDataInState.collect {
+                        cartItemsList = it.isSuccess
                     }
                 }
-            })
-
-            Column {
-                Row {
-                    chipsListCategory?.let { stringList ->
-                        Categories(
-                            categories = stringList,
-                            onSelectCategory = {
-                                viewModel.setCategory(it)
-                            },
-                            selectedCategory = viewModel.selectedCategory.value,
-                            navController = navController
-                        )
+                scope.launch {
+                    wishListViewModel.getDataInState.collect {
+                        wishListItems = it.isSuccess
                     }
                 }
-                LazyVerticalGrid(columns = GridCells.Fixed(2), content = {
+                val cartItemIds = cartItemsList?.map { it.title }
+                val wishListIds = wishListItems?.map { it.title }
+                itemsList?.size?.let {
+                    println(itemsList!!.size.toString())
+                    items(itemsList!!) {
+                        val goToCart = cartItemIds?.contains(it.title)
+                        val wishListItemSelection = wishListIds?.contains(it.title)
 
-                    scope.launch {
-                        cartViewModel.getDataInState.collect{
-                            cartItemsList=it.isSuccess
-                        }
-                    }
-
-                        val cartItemIds = cartItemsList?.map { it.title }
-
-
-                    Log.e("cartItemId's",cartItemIds.toString())
-
-
-                    itemsList?.size?.let {
-                        println(itemsList!!.size.toString())
-                        items(itemsList!!) {
-                           val goToCart= cartItemIds?.contains(it.title)
-
-                            SingleItems(item = it, onItemClick = {
+                        SingleItems(
+                            item = it,
+                            onItemClick = {
                                 navController.setData(Constants.ITEMSLIST, it)
+                                navController.setData(Constants.cartValidation, goToCart)
+                                navController.setData(
+                                    Constants.wishListValidation,
+                                    wishListItemSelection
+                                )
                                 onItemClick()
-                            }, viewModel,goToCart,navController)
-                        }
+                            },
+                            viewModel,
+                            goToCart,
+                            navController,
+                            wishListItemSelection,
+                            onWishlistClick = {
+                                scope.launch {
+                                    val result = snackBarHostState.showSnackbar(
+                                        message = context.getString(R.string.addedToWishList),
+                                        actionLabel = context.getString(R.string.goToCart),
+                                        duration = androidx.compose.material3.SnackbarDuration.Short
+                                    )
+                                    when (result) {
+                                        SnackbarResult.ActionPerformed -> {
+                                            navController.setData(
+                                                Constants.wishlistScreen,
+                                                Constants.wishlistScreen
+                                            )
+                                            navController.navigate(NavRoute.HomeScreen.route)
+                                        }
+
+                                        SnackbarResult.Dismissed -> {
+
+                                        }
+                                    }
+                                }
+
+
+                            })
+
+
                     }
-                })
-            }
+                }
 
-
+            })
+        }
+    }
 }
-
-
 
 
 @Composable
@@ -182,18 +252,15 @@ fun SingleItems(
     viewModel: ProductViewModel = hiltViewModel(),
     goToCart: Boolean?,
     navController: NavHostController,
-cartViewModel: CartViewModel = hiltViewModel()
+    wishListItemSelected: Boolean?,
+    onWishlistClick: () -> Unit = {}
 ) {
-    var colorChange by remember {
+    val colorChange = remember {
         mutableStateOf(false)
     }
     var count by remember {
         mutableStateOf(0)
     }
-
-    val scope= rememberCoroutineScope()
-    val context= LocalContext.current
-
     Card(
         modifier = Modifier
             .wrapContentSize()
@@ -221,19 +288,21 @@ cartViewModel: CartViewModel = hiltViewModel()
                 horizontalArrangement = Arrangement.End
             ) {
                 Icon(
-                    painter = if (colorChange) painterResource(id = R.drawable.baseline_favorite_24) else painterResource(
-                        id = R.drawable.baseline_favorite_24
-                    ), contentDescription = null, modifier = Modifier
+                    painter = painterResource(id = R.drawable.baseline_favorite_24),
+                    contentDescription = null,
+                    modifier = Modifier
                         .wrapContentSize()
                         .clickable {
-                            colorChange = !colorChange
-                            if (colorChange) {
+                            onWishlistClick.invoke()
+                            item.isSelected = !item.isSelected
+                            colorChange.value = !colorChange.value
+                            if (colorChange.value) {
                                 viewModel.addToWishlistData(item)
-                            }
-                            else{
+                            } else {
                                 viewModel.deleteWishlistItem("${item.title}-${item.id}")
                             }
-                        }, tint = if (colorChange) Color.Red else Color.Gray
+                        },
+                    tint = if (colorChange.value || wishListItemSelected == true || item.isSelected) Color.Red else Color.Gray
                 )
             }
 
@@ -285,11 +354,17 @@ cartViewModel: CartViewModel = hiltViewModel()
                 RatingBarHalfStar(currentRating = item.rating.toFloat(), onRatingChanged = {})
                 Button(
                     onClick = {
-                       count++
-                        if(goToCart==true){
-                        navController.popBackStack()
+                        item.quantity = 1
+                        if (count == 0) {
+                            count++
+                        } else {
+                            count = 0
                         }
-                        viewModel.storeAddToCartData(product=item, context = context)
+                        if (goToCart == true || count == 1) {
+                            navController.setData(Constants.cartScreen, Constants.cartScreen)
+                            navController.navigate(NavRoute.HomeScreen.route)
+                        }
+                        viewModel.storeAddToCartData(product = item)
                     },
                     modifier = Modifier
                         .wrapContentSize()
@@ -300,14 +375,14 @@ cartViewModel: CartViewModel = hiltViewModel()
                             bottom = dimensionResource(id = R.dimen.two)
                         ),
                 ) {
-                    if(goToCart==true||count==1){
+                    if (goToCart == true || count == 1) {
                         Text(stringResource(id = R.string.goToCart))
-                    }
-                    else {
+                    } else {
                         Text(stringResource(id = R.string.addToCart))
                     }
 
                 }
+
             }
         }
     }

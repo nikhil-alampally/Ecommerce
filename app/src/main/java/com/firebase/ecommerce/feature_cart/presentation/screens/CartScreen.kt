@@ -174,7 +174,9 @@ fun CartScreen(viewModel: CartViewModel = hiltViewModel(),navController: NavCont
                     )
                     Button(
                         onClick = {
-                               navController.navigate(NavRoute.PlaceOrder.route)
+                            navController.currentBackStackEntry?.savedStateHandle?.set("totalPrice", totalPrice)
+                            navController.currentBackStackEntry?.savedStateHandle?.set("totalPriceWithQuantity", totalPriceWithQuantity)
+                            navController.navigate(NavRoute.PlaceOrder.route)
                         },
                         modifier = Modifier.padding(dimensionResource(id = R.dimen.five)),
                         colors = ButtonDefaults.buttonColors(

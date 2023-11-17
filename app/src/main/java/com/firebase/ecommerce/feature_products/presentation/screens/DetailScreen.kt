@@ -1,5 +1,6 @@
 package com.firebase.ecommerce.feature_products.presentation.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,16 +29,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.firebase.ecommerce.R
 import com.firebase.ecommerce.core.ConnectionState
 import com.firebase.ecommerce.core.connectivityState
+import com.firebase.ecommerce.feature_cart.domain.model.CartItem
+import com.firebase.ecommerce.feature_cart.presentation.viewmodel.CartViewModel
 import com.firebase.ecommerce.feature_login.presentation.screens.CustomDialogBox
 import com.firebase.ecommerce.feature_products.domain.model.Product
+import com.firebase.ecommerce.navigation.NavRoute
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun DetailScreen(product: Product, navController: NavController){
+fun DetailScreen(product: Product, navController: NavController,cartValidation:Boolean,wishListValidation:Boolean){
     val connection by connectivityState()
     if(connection== ConnectionState.Unavailable) {
         var showDialog by remember {
@@ -50,6 +58,7 @@ fun DetailScreen(product: Product, navController: NavController){
     var colorChange by remember {
         mutableStateOf(false)
     }
+
     Column(modifier=Modifier.verticalScroll(rememberScrollState())) {
         
         Icon(
@@ -88,7 +97,7 @@ fun DetailScreen(product: Product, navController: NavController){
                 .clickable {
                     colorChange = !colorChange
                 }
-                .size(35.dp), tint = if(colorChange) Color.Red else Color.LightGray)
+                .size(35.dp), tint = if(colorChange||wishListValidation) Color.Red else Color.LightGray)
         }
 
         Text(text=product.description, modifier = Modifier.padding(vertical = 2.dp, horizontal = 10.dp))
@@ -117,14 +126,18 @@ fun DetailScreen(product: Product, navController: NavController){
         )
 
         Button(
-            onClick = {},
+            onClick = {
+                      if(cartValidation){
+                          navController.navigate(NavRoute.HomeScreen.route)
+                      }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp)
         )
         {
             Text(
-                text= stringResource(id = R.string.addToCart),
+                text= stringResource(id = if(cartValidation)R.string.goToCart else R.string.addToCart),
                 modifier = Modifier.padding(vertical =8.dp)
             )
         }

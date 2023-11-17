@@ -13,7 +13,8 @@ data class ProductDto(
     val rating: Double,
     val stock: Int,
     val thumbnail: String,
-    val title: String
+    val title: String,
+    val quantity: Int ,
 )
 
 internal fun ProductDto.toDomain(): Product {
@@ -28,7 +29,7 @@ internal fun ProductDto.toDomain(): Product {
         rating=rating,
         stock=stock,
         thumbnail=thumbnail,
-        title=title
-
+        title=title,
+        quantity = quantity
     )
 }
