@@ -75,5 +75,7 @@
     <string name="orderSummary">Order Summary</string>
     <string name="addedToWishList">Added to WishList</string>
     <string name="goToWishList">go to wishList</string>
+    <string name="seeAllTheDetails">see all the details</string>
+    <string name="success">"success"</string>
 
 </resources>

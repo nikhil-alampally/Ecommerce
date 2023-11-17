@@ -4,18 +4,22 @@ import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.TextButton
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,7 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -50,9 +56,7 @@ import java.util.Date
     "MutableCollectionMutableState"
 )
 @Composable
-fun Orders(
-    cartViewModel: CartViewModel = hiltViewModel(),
-) {
+fun Orders(cartViewModel: CartViewModel = hiltViewModel()) {
     var itemsList by remember {
         mutableStateOf<ArrayList<CartItem>?>(null)
     }
@@ -81,18 +85,18 @@ fun Orders(
 
 
     val sdf =
-        SimpleDateFormat("'Date\n'dd-MM-yyyy '\n\nand\n\nTime\n'HH:mm:ss z")
+        SimpleDateFormat("MMM dd uuuu")
     val currentDateAndTime = sdf.format(Date())
     val context = LocalContext.current
     val dateFormat =
-        SimpleDateFormat("dd-MM-yyyy")
+        SimpleDateFormat("MMM dd yyyy")
     val date = dateFormat.format(Date())
     itemsList?.forEach { item ->
         cartViewModel.addOrderSummary(
             OrderDetails(
-                addressId = "success",
+                paymentStatus = stringResource(id = R.string.success),
                 cartId = item.title,
-                orderSummaryId = currentDateAndTime,
+                deliveryDate = currentDateAndTime,
                 orderDate = date
             ), context
         )
@@ -103,7 +107,7 @@ fun Orders(
             stringResource(id = R.string.orderSummary),
             fontWeight = FontWeight.Bold,
             color = Color.Black,
-            modifier = Modifier.padding(top=20.dp),
+            modifier = Modifier.padding(start = 20.dp, top = 20.dp),
             fontSize = 20.sp
         )
         LazyColumn(content = {
@@ -115,109 +119,125 @@ fun Orders(
                             androidx.compose.material3.Card(
                                 modifier = Modifier
                                     .wrapContentSize()
-                                    .height(180.dp)
-                                    .background(color = Color.Transparent)
+                                    .background(color = Color.White)
                                     .padding(
                                         horizontal = dimensionResource(R.dimen.twenty),
                                         vertical = dimensionResource(R.dimen.ten),
-
-                                        ),
+                                    ),
+                                colors = CardDefaults.cardColors(Color.White),
                                 elevation = CardDefaults.outlinedCardElevation(dimensionResource(id = R.dimen.eight)),
                             ) {
 
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-
+                                        .padding(start = 10.dp)
                                 ) {
+                                    Column(Modifier.weight(3f)) {
+                                        Text(
+                                            text = item.title,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(
+                                                top = dimensionResource(
+                                                    R.dimen.twenty
+                                                )
+                                            ),
+                                            maxLines = 1
+                                        )
+                                        Text(
+                                            text = item.description,
+                                            fontWeight = FontWeight.Normal,
+                                            modifier = Modifier,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        Text(
+                                            text = "Rs:${item.price.toDouble()}",
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier
+                                                .wrapContentSize()
+                                                .clickable {})
+
+                                        Divider(modifier = Modifier.fillMaxWidth())
+
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            modifier = Modifier.padding(top = 10.dp)
+                                        ) {
+                                            AsyncImage(
+                                                model = R.drawable.baseline_check_24,
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .size(dimensionResource(id = R.dimen.fifteen))
+                                                    .clip(CircleShape)
+                                                    .background(Color(0xffF28500))
+                                                    .clickable {
+
+                                                    }
+                                            )
+                                            Text(
+                                                "Order Confirmed on ${orderDetails.orderDate}",
+                                                color = Color.Black,
+                                                fontSize = 12.sp,
+                                                modifier = Modifier.padding(start = 2.dp)
+                                            )
+                                        }
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(start = 5.dp)
+                                        ) {
+                                            Box(
+                                                Modifier
+                                                    .height(30.dp)
+                                                    .width(2.dp)
+                                                    .background(Color.LightGray)
+                                                    .height(10.dp)
+                                                    .padding(start = 40.dp),
+                                            )
+                                        }
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            AsyncImage(
+                                                model = R.drawable.baseline_check_24,
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+
+                                                modifier = Modifier
+                                                    .size(dimensionResource(id = R.dimen.fifteen))
+                                                    .clip(CircleShape)
+                                                    .background(Color(0xff3CB043))
+                                                    .clickable {
+
+                                                    }
+                                            )
+                                            Text(
+                                                "Delivery Confirmed on ${orderDetails.deliveryDate}",
+                                                fontSize = 12.sp,
+                                                color = Color.Black,
+                                                modifier = Modifier.padding(start = 2.dp)
+                                            )
+                                        }
+                                        TextButton(onClick = {}) {
+                                            Text(stringResource(id = R.string.seeAllTheDetails), color = Color(0xff57A0D2))
+                                        }
+                                    }
                                     AsyncImage(
                                         model = item.images,
                                         contentDescription = null,
                                         modifier = Modifier
-                                            .size(120.dp)
+                                            .size(80.dp)
                                             .weight(1f)
                                             .padding(dimensionResource(id = R.dimen.ten)),
                                         contentScale = ContentScale.FillBounds,
                                         placeholder = painterResource(id = R.drawable.img)
                                     )
-
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .weight(2f)
-                                            .fillMaxHeight()
-                                            .padding(start = dimensionResource(R.dimen.ten))
-
-                                    ) {
-                                        Text(
-                                            text = item.title,
-                                            fontWeight = FontWeight.Bold,
-                                            modifier = Modifier.padding(top = dimensionResource(R.dimen.twenty)),
-                                            maxLines = 1
-                                        )
-
-
-                                        Row {
-                                            Text(
-                                                text = "Rs:${item.price.toDouble()}",
-                                                fontWeight = FontWeight.Bold,
-                                                modifier = Modifier
-                                                    .wrapContentSize()
-                                                    .clickable {})
-                                            Text(
-                                                text = "(${item.discountPercentage}% off)",
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.Red,
-                                                modifier = Modifier.padding(
-                                                    start = dimensionResource(
-                                                        id = R.dimen.ten
-                                                    )
-                                                ),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
-
-                                        }
-
-                                        Text(
-                                            text = "quantity:${item.quantity}",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            modifier = Modifier.padding(
-                                                bottom = dimensionResource(
-                                                    id = R.dimen.five
-                                                )
-                                            )
-                                        )
-                                        Text(
-                                            text = "total:${item.price * item.quantity}",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            modifier = Modifier.padding(
-                                                bottom = dimensionResource(
-                                                    id = R.dimen.five
-                                                )
-                                            )
-                                        )
-                                        Text(
-                                            text = "DeliveryDate=${orderDetails.orderDate}",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            modifier = Modifier.padding(
-                                                bottom = dimensionResource(
-                                                    id = R.dimen.five
-                                                )
-                                            )
-                                        )
-                                    }
                                 }
                             }
                         }
                     }
-
                 }
             }
         })
     }
-
 }
