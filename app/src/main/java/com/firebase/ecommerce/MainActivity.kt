@@ -1,7 +1,7 @@
 package com.firebase.ecommerce
 
-import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,17 +13,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import com.firebase.ecommerce.navigation.NavGraph
+import com.firebase.ecommerce.navigation.NavRoute
 import com.firebase.ecommerce.ui.theme.EcommerceTheme
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.razorpay.PaymentResultListener
 import dagger.hilt.android.AndroidEntryPoint
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), PaymentResultListener {
 
     private var isPaymentSuccessful by mutableStateOf(false)
 
+    var navController : NavHostController? = null
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,28 +37,25 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (isPaymentSuccessful) {
+                    navController = rememberAnimatedNavController()
+                    NavGraph(this@MainActivity, this, navController!!)
 
-                    } else {
-                            NavGraph( this)
-                        }
                 }
             }
         }
 
     }
     override fun onPaymentSuccess(p0: String?) {
-        isPaymentSuccessful = true
-        val intent=Intent(this,MainActivity::class.java)
-        startActivity(intent)
-        Toast.makeText(this, "Payment successful $p0", Toast.LENGTH_SHORT).show()
+        try {
+            Toast.makeText(this, "Payment successful $p0", Toast.LENGTH_SHORT).show()
+            navController?.navigate(NavRoute.Orders.route)
+        } catch (e: Exception) {
+            Log.e("NavigationError", "Error navigating to home screen: ${e.message}", e)
+        }
     }
 
     override fun onPaymentError(p0: Int, p1: String?) {
         isPaymentSuccessful = false
         Toast.makeText(this, "Error $p1", Toast.LENGTH_SHORT).show()
     }
-
-
 }
-
