@@ -77,5 +77,6 @@
     <string name="goToWishList">go to wishList</string>
     <string name="seeAllTheDetails">see all the details</string>
     <string name="success">"success"</string>
+    <string name="go_to_wishlist">go to wishlist</string>
 
 </resources>

@@ -38,24 +38,26 @@ class MainActivity : ComponentActivity(), PaymentResultListener {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberAnimatedNavController()
-                    NavGraph(this@MainActivity, this, navController!!)
+                    NavGraph(this@MainActivity,
+                        this,
+                        navController!!)
 
                 }
             }
         }
 
     }
-    override fun onPaymentSuccess(p0: String?) {
+    override fun onPaymentSuccess(paymentId: String?) {
         try {
-            Toast.makeText(this, "Payment successful $p0", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Payment successful $paymentId", Toast.LENGTH_SHORT).show()
             navController?.navigate(NavRoute.Orders.route)
         } catch (e: Exception) {
             Log.e("NavigationError", "Error navigating to home screen: ${e.message}", e)
         }
     }
 
-    override fun onPaymentError(p0: Int, p1: String?) {
+    override fun onPaymentError(paymentId: Int, paymentError: String?) {
         isPaymentSuccessful = false
-        Toast.makeText(this, "Error $p1", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Error $paymentError", Toast.LENGTH_SHORT).show()
     }
 }

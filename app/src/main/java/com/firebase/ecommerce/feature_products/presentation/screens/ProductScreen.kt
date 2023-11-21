@@ -214,7 +214,7 @@ fun ProductScreen(
                                 scope.launch {
                                     val result = snackBarHostState.showSnackbar(
                                         message = context.getString(R.string.addedToWishList),
-                                        actionLabel = context.getString(R.string.goToCart),
+                                        actionLabel = context.getString(R.string.go_to_wishlist),
                                         duration = androidx.compose.material3.SnackbarDuration.Short
                                     )
                                     when (result) {

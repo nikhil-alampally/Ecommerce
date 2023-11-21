@@ -44,7 +44,6 @@ val tweenSpec =
 fun NavGraph(
     mainActivity: MainActivity, activity: Activity, navController: NavHostController
 ) {
-    val navController = rememberAnimatedNavController()
     AnimatedNavHost(
         navController = navController, startDestination = NavRoute.SplashScreen.route
     ) {
