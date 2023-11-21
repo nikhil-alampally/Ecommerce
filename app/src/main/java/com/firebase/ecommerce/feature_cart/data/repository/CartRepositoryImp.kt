@@ -137,7 +137,7 @@ class CartRepositoryImp @Inject constructor(
                             value.let { it1 ->
                                 fireBase.firestore.collection(Constants.orderSummaryCollectionPath)
                                     .document(it1).collection(
-                                    Constants.cartItemInternalCollectionPath
+                                    Constants.orderSummaryInternalCollectionPath
                                 )
                             }
                         docRef.document(orderDetails.cartId).set(orderDetails)

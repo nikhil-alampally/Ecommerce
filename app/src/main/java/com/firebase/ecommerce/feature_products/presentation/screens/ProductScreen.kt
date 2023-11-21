@@ -358,9 +358,11 @@ fun SingleItems(
                         if (count == 0) {
                             count++
                         } else {
-                            count = 0
+                            count = 1
+                            navController.setData(Constants.cartScreen, Constants.cartScreen)
+                            navController.navigate(NavRoute.HomeScreen.route)
                         }
-                        if (goToCart == true || count == 1) {
+                        if (goToCart == true ) {
                             navController.setData(Constants.cartScreen, Constants.cartScreen)
                             navController.navigate(NavRoute.HomeScreen.route)
                         }
