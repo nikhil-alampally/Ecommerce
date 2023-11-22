@@ -561,7 +561,8 @@ fun MainScreen(
     addAddress: @Composable () -> Unit = {},
     payment: @Composable () -> Unit = {},
     orderSummary: @Composable () -> Unit = {},
-    currentStepScreen: Int = 1
+    currentStepScreen: Int = 1,
+    navController: NavHostController
 ) {
 
     Column(

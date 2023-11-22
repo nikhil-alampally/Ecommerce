@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
+import com.firebase.ecommerce.MainActivity
 import com.firebase.ecommerce.SplashScreen
 import com.firebase.ecommerce.core.Constants
 import com.firebase.ecommerce.feature_cart.presentation.screens.PaymentSuccessScreen
@@ -41,9 +42,8 @@ val tweenSpec =
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavGraph(
-    activity: Activity,
+    mainActivity: MainActivity, activity: Activity, navController: NavHostController
 ) {
-    val navController = rememberAnimatedNavController()
     AnimatedNavHost(
         navController = navController, startDestination = NavRoute.SplashScreen.route
     ) {
@@ -134,7 +134,8 @@ fun NavGraph(
                         OrderSummary(activity = activity, navController = navController, addAddress = addAddress)
                     }
                 },
-                currentStepScreen = if(currentStep!=null) currentStep else 1
+                currentStepScreen = if(currentStep!=null) currentStep else 1,
+                navController = navController
 
                 )
 
